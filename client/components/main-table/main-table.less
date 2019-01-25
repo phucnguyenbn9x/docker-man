@@ -1,0 +1,38 @@
+main-table {
+  .table-files .selected,
+  .iconset .thumbnail.selected {
+    background: #2196f3;
+  }
+  .iconset .thumbnail.selected {
+    color: #fff;
+  }
+  .iconset .thumbnail.selected,
+  .table-files .selected td,
+  .table-files .selected td a {
+    color: #fff;
+    background-color: #2196f3;
+  }
+  .selected .item-extension::after {
+    color: #2196f3;
+  }
+
+  .table-files {
+    flex: 3;
+    margin-left: 15px;
+    width: calc(100% - 30px);
+    thead {
+      th:nth-child(2) {
+        width: 20%;
+      }
+      th:nth-child(3) {
+        width: 20%;
+      }
+    }
+    tr > td {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      vertical-align: middle;
+    }
+  }
+}

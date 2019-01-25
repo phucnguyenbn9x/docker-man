@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" ng-app='app'>
+
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+		<link rel="stylesheet" href="./client/vendor/css/bootstrap.min.css">
+
+		<title>Title-App</title>
+	</head>
+
+	<body style="height: 100vh;">
+		<containers-man end-point="http://localhost:2375"></containers-man>
+		<images-man end-point="http://localhost:2375"></images-man>
+		<volumes-man end-point="http://localhost:2375"></volumes-man>
+
+		<script src="./client/vendor/js/jquery.min.js"></script>
+		<script src="./client/vendor/js/angular.min.js"></script>
+		<script src="./public/docker-man.bundle.js"></script>
+		<script src="./client/app.js"></script>
+	</body>
+
+</html>

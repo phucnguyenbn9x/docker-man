@@ -1,0 +1,34 @@
+<div class="main-content">
+	<div class="table-files">
+		<table class="table mb0 noselect">
+			<thead>
+				<tr>
+					<th ng-repeat="header in self.headerList">
+						<a href="">
+							{{ header }}
+						</a>
+					</th>
+					<th ng-if="self.actions">
+						<a href="">
+							Actions
+						</a>
+					</th>
+				</tr>
+			</thead>
+			<tbody class="file-item">
+				<tr class="item-list" ng-class="{selected: self.isSelected(item)}" ng-repeat="item in self.itemList">
+					<td ng-repeat="header in self.headerList">
+						<span>
+							{{ item[header] }}
+						</span>
+					</td>
+					<td style="padding: 0;">
+						<span>
+							<action-bar actions="self.actions" item="item"></action-bar>
+						</span>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>

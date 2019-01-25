@@ -1,0 +1,107 @@
+const moduleName = 'api-service';
+const serviceName = 'apiService';
+
+let app = angular.module(moduleName, []);
+
+app.service(serviceName, function($http) {
+  let self = this;
+
+  // Containers
+  this.listContainers = function(cb) {
+    const LIST_CONTAINER = this.baseUrl + '/containers/json?all=1';
+    httpGet(LIST_CONTAINER, cb);
+  };
+  this.startContainer = function(payload, cb) {
+    const START_CONTAINER = this.baseUrl + `/containers/${payload.Id}/start`;
+    httpPost(START_CONTAINER, {}, cb);
+  };
+  this.stopContainer = function(payload, cb) {
+    const STOP_CONTAINER = this.baseUrl + `/containers/${payload.Id}/stop`;
+    httpPost(STOP_CONTAINER, {}, cb);
+  };
+  this.restartContainer = function(payload, cb) {
+    const RESTART_CONTAINER =
+      this.baseUrl + `/containers/${payload.Id}/restart`;
+    httpPost(RESTART_CONTAINER, {}, cb);
+  };
+  this.pauseContainer = function(payload, cb) {
+    const PAUSE_CONTAINER = this.baseUrl + `/containers/${payload.Id}/pause`;
+    httpPost(PAUSE_CONTAINER, {}, cb);
+  };
+  this.resumeContainer = function(payload, cb) {
+    const RESUME_CONTAINER = this.baseUrl + `/containers/${payload.Id}/unpause`;
+    httpPost(RESUME_CONTAINER, {}, cb);
+  };
+  this.removeContainer = function(payload, cb) {
+    const REMOVE_CONTAINER =
+      this.baseUrl + `/containers/${payload.Id}?force=true&v=0`;
+    httpDelete(REMOVE_CONTAINER, cb);
+  };
+
+  // Images
+  this.listImages = function(cb) {
+    const LIST_IMAGES = this.baseUrl + '/images/json?all=0';
+    httpGet(LIST_IMAGES, cb);
+  };
+
+  // Volumes
+  this.listVolumes = function(cb) {
+    const LIST_VOLUMES = this.baseUrl + '/volumes';
+    httpGet(LIST_VOLUMES, cb);
+  };
+
+  function httpGet(url, cb) {
+    let reqOptions = {
+      method: 'GET',
+      url: url,
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    };
+    $http(reqOptions).then(
+      result => {
+        cb(result);
+      },
+      err => {
+        console.log(err);
+      }
+    );
+  }
+  function httpPost(url, payload, cb) {
+    let reqOptions = {
+      method: 'POST',
+      url: url,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      data: payload
+    };
+    $http(reqOptions).then(
+      result => {
+        cb(result);
+      },
+      err => {
+        console.log(err);
+      }
+    );
+  }
+  function httpDelete(url, cb) {
+    let reqOptions = {
+      method: 'DELETE',
+      url: url,
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    };
+    $http(reqOptions).then(
+      result => {
+        cb(result);
+      },
+      err => {
+        console.log(err);
+      }
+    );
+  }
+});
+
+module.exports.name = moduleName;
