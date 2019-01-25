@@ -22,6 +22,13 @@ function Controller($scope, $element, $http, $filter, apiService) {
     self.actionsTable = [{name: 'Refresh', handle: self.listImages}];
 
     self.listImages();
+
+    self.updateImgListId = setInterval(function() {
+      self.listImages();
+    }, 5000);
+  };
+  this.$onDestroy = function() {
+    clearInterval(self.updateImgListId);
   };
 
   this.listImages = function() {
@@ -37,7 +44,17 @@ function Controller($scope, $element, $http, $filter, apiService) {
     });
   };
 
-  this.update = function() {};
+  this.update = function(image) {
+    let tag = image.Tags[0];
+    let colonIndex = tag.lastIndexOf(':');
+    let payload = {
+      fromImage: tag.slice(0, colonIndex),
+      tag: tag.slice(colonIndex + 1)
+    };
+    apiService.createImage(payload, res => {
+      console.log('---Updated');
+    });
+  };
 }
 
 let app = angular.module(moduleName, [

@@ -41,6 +41,7 @@ module.exports = {
   //   })
   // ],
   entry: [
+    './client/components/docker-man/docker-man.js',
     './client/components/containers-man/containers-man.js',
     './client/components/images-man/images-man.js',
     './client/components/volumes-man/volumes-man.js'

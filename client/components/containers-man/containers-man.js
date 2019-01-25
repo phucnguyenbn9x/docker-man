@@ -30,6 +30,14 @@ function Controller($scope, $element, $http, $filter, apiService) {
     self.actionsTable = [{name: 'Refresh', handle: self.listContainers}];
 
     self.listContainers();
+
+    self.updateCtnListId = setInterval(function() {
+      self.listContainers();
+    }, 5000);
+  };
+
+  this.$onDestroy = function() {
+    clearInterval(self.updateCtnListId);
   };
 
   this.listContainers = function() {
@@ -55,37 +63,37 @@ function Controller($scope, $element, $http, $filter, apiService) {
   this.start = function(ctn) {
     if (!ctn) return;
     apiService.startContainer(ctn, res => {
-      self.listContainer();
+      self.listContainers();
     });
   };
   this.stop = function(ctn) {
     if (!ctn) return;
     apiService.stopContainer(ctn, res => {
-      self.listContainer();
+      self.listContainers();
     });
   };
   this.restart = function(ctn) {
     if (!ctn) return;
     apiService.restartContainer(ctn, res => {
-      self.listContainer();
+      self.listContainers();
     });
   };
   this.pause = function(ctn) {
     if (!ctn) return;
     apiService.pauseContainer(ctn, res => {
-      self.listContainer();
+      self.listContainers();
     });
   };
   this.resume = function(ctn) {
     if (!ctn) return;
     apiService.resumeContainer(ctn, res => {
-      self.listContainer();
+      self.listContainers();
     });
   };
   this.remove = function(ctn) {
     if (!ctn) return;
     apiService.removeContainer(ctn, res => {
-      self.listContainer();
+      self.listContainers();
     });
   };
 }

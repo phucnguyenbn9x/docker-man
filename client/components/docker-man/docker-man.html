@@ -1,0 +1,4 @@
+<tool-bar tabs-name="self.tabsName" select-tab="self.selectTab"></tool-bar>
+<containers-man ng-if="self.selectedTab == 'Containers'" end-point="http://localhost:2375"></containers-man>
+<images-man ng-if="self.selectedTab == 'Images'" end-point="http://localhost:2375"></images-man>
+<volumes-man ng-if="self.selectedTab == 'Volumes'" end-point="http://localhost:2375"></volumes-man>

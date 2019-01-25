@@ -17,7 +17,7 @@
 			</thead>
 			<tbody class="file-item">
 				<tr class="item-list" ng-class="{selected: self.isSelected(item)}" ng-repeat="item in self.itemList">
-					<td ng-repeat="header in self.headerList">
+					<td ng-repeat="header in self.headerList" ng-attr-title="{{ item[header] }}">
 						<span>
 							{{ item[header] }}
 						</span>

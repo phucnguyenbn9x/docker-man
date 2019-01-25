@@ -43,6 +43,14 @@ app.service(serviceName, function($http) {
     const LIST_IMAGES = this.baseUrl + '/images/json?all=0';
     httpGet(LIST_IMAGES, cb);
   };
+  this.createImage = function(payload, cb) {
+    const CREATE_IMAGE =
+      this.baseUrl +
+      `/images/create?fromImage=${encodeURIComponent(
+        payload.fromImage
+      )}&tag=${encodeURIComponent(payload.tag)}`;
+    httpPost(CREATE_IMAGE, payload, cb);
+  };
 
   // Volumes
   this.listVolumes = function(cb) {
@@ -80,9 +88,7 @@ app.service(serviceName, function($http) {
       result => {
         cb(result);
       },
-      err => {
-        console.log(err);
-      }
+      err => {}
     );
   }
   function httpDelete(url, cb) {

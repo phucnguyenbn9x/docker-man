@@ -21,6 +21,13 @@ function Controller($scope, $element, $http, $filter, apiService) {
     self.actionsTable = [{name: 'Refresh', handle: self.listVolumes}];
 
     self.listVolumes();
+
+    self.updateVolListId = setInterval(() => {
+      self.listVolumes();
+    }, 5000);
+  };
+  this.$onDestroy = function() {
+    clearInterval(self.updateVolListId);
   };
 
   this.listVolumes = function() {

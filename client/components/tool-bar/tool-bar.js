@@ -5,6 +5,15 @@ const componentName = 'toolBar';
 
 function Controller($scope, $element, $http) {
   let self = this;
+
+  this.$onInit = function() {
+    self.selectedTab = self.tabsName[0];
+  };
+
+  this.clickHandle = function(tab) {
+    self.selectedTab = tab;
+    self.selectTab && self.selectTab(tab);
+  };
 }
 
 let app = angular.module(moduleName, []);
@@ -14,7 +23,8 @@ app.component(componentName, {
   controller: Controller,
   controllerAs: 'self',
   bindings: {
-    title: '<'
+    tabsName: '<',
+    selectTab: '<'
   }
 });
 
