@@ -18,6 +18,7 @@
     "cors": "^2.8.5",
     "ejs": "^2.6.1",
     "express": "^4.16.4",
+    "jquery": "^3.3.1",
     "request": "^2.88.0"
   },
   "devDependencies": {

@@ -1,3 +1,5 @@
+require('../../vendor/js/angular-modal-service.min');
+
 require('./docker-man.less');
 
 const apiServiceMd = require('../../services/api-service').name;
@@ -18,6 +20,7 @@ function Controller($scope, $element, $http, $filter, apiService) {
   let self = this;
 
   this.$onInit = () => {
+    apiService.baseUrl = self.endPoint;
     self.tabsName = ['Containers', 'Images', 'Volumes'];
     self.selectedTab = self.tabsName[0];
   };
@@ -28,6 +31,7 @@ function Controller($scope, $element, $http, $filter, apiService) {
 }
 
 let app = angular.module(moduleName, [
+  'angularModalService',
   toolBarMd,
   actionBarMd,
   mainTableMd,

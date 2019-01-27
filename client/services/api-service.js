@@ -11,6 +11,7 @@ app.service(serviceName, function($http) {
     const LIST_CONTAINER = this.baseUrl + '/containers/json?all=1';
     httpGet(LIST_CONTAINER, cb);
   };
+  this.addContainer = function(cb) {};
   this.startContainer = function(payload, cb) {
     const START_CONTAINER = this.baseUrl + `/containers/${payload.Id}/start`;
     httpPost(START_CONTAINER, {}, cb);

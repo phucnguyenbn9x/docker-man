@@ -1,21 +1,21 @@
 require('./containers-man.less');
 
-const apiServiceMd = require('../../services/api-service').name;
-
-const dcFiltersMd = require('../../filters/dc-filters').name;
-
-const toolBarMd = require('../tool-bar/tool-bar').name;
-const actionBarMd = require('../action-bar/action-bar').name;
-const mainTableMd = require('../main-table/main-table').name;
+const addContainerDialog = require('../../dialogs/add-container/add-container');
 
 const moduleName = 'containers-man';
 const componentName = 'containersMan';
 
-function Controller($scope, $element, $http, $filter, apiService) {
+function Controller(
+  $scope,
+  $element,
+  $http,
+  $filter,
+  ModalService,
+  apiService
+) {
   let self = this;
 
   this.$onInit = function() {
-    apiService.baseUrl = self.endPoint;
     self.title = 'Containers';
     self.headerList = ['Name', 'State', 'Image', 'Created', 'Ports'];
     self.actions = [
@@ -27,7 +27,7 @@ function Controller($scope, $element, $http, $filter, apiService) {
       // {name: 'Remove', handle: self.remove}
       // {name: 'Add container', handle: self.addContainer}
     ];
-    self.actionsTable = [{name: 'Refresh', handle: self.listContainers}];
+    self.actionsTable = [{name: 'Add container', handle: self.addContainer}];
 
     self.listContainers();
 
@@ -59,6 +59,82 @@ function Controller($scope, $element, $http, $filter, apiService) {
         return result;
       });
     });
+  };
+  this.addContainer = function() {
+    addContainerDialog(ModalService);
+    let payload = {
+      Cmd: [],
+      Env: [],
+      ExposedPorts: {},
+      HostConfig: {
+        Binds: [],
+        CapAdd: [
+          'AUDIT_WRITE',
+          'CHOWN',
+          'DAC_OVERRIDE',
+          'FOWNER',
+          'FSETID',
+          'KILL',
+          'MKNOD',
+          'NET_BIND_SERVICE',
+          'NET_RAW',
+          'SETFCAP',
+          'SETGID',
+          'SETPCAP',
+          'SETUID',
+          'SYS_CHROOT'
+        ],
+        CapDrop: [
+          'AUDIT_CONTROL',
+          'BLOCK_SUSPEND',
+          'DAC_READ_SEARCH',
+          'IPC_LOCK',
+          'IPC_OWNER',
+          'LEASE',
+          'LINUX_IMMUTABLE',
+          'MAC_ADMIN',
+          'MAC_OVERRIDE',
+          'NET_ADMIN',
+          'NET_BROADCAST',
+          'SYSLOG',
+          'SYS_ADMIN',
+          'SYS_BOOT',
+          'SYS_MODULE',
+          'SYS_NICE',
+          'SYS_PACCT',
+          'SYS_PTRACE',
+          'SYS_RAWIO',
+          'SYS_RESOURCE',
+          'SYS_TIME',
+          'SYS_TTY_CONFIG',
+          'WAKE_ALARM'
+        ],
+        Devices: [],
+        NetworkMode: 'bridge',
+        PortBindings: {},
+        Privileged: false,
+        PublishAllPorts: false,
+        RestartPolicy: {
+          Name: 'no'
+        }
+      },
+      Image: '',
+      Labels: {},
+      MacAddress: '',
+      NetworkingConfig: {
+        EndpointsConfig: {
+          bridge: {
+            IPAMConfig: {
+              IPv4Address: '',
+              IPv6Address: ''
+            }
+          }
+        }
+      },
+      OpenStdin: false,
+      Tty: false,
+      Volumes: {}
+    };
   };
   this.start = function(ctn) {
     if (!ctn) return;
@@ -98,21 +174,13 @@ function Controller($scope, $element, $http, $filter, apiService) {
   };
 }
 
-let app = angular.module(moduleName, [
-  toolBarMd,
-  actionBarMd,
-  mainTableMd,
-  apiServiceMd,
-  dcFiltersMd
-]);
+let app = angular.module(moduleName, []);
 
 app.component(componentName, {
   template: require('./containers-man.html'),
   controller: Controller,
   controllerAs: 'self',
-  bindings: {
-    endPoint: '@'
-  }
+  bindings: {}
 });
 
 module.exports.name = moduleName;
