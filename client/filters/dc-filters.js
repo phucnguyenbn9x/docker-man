@@ -7,7 +7,9 @@ app.filter('formatDate', [
   function() {
     return function(input) {
       return Number.isInteger(input)
-        ? new Date(input * 1000)
+        ? new Date(
+            input * 1000 - (new Date().getTimezoneOffset() / 60) * 3600 * 1000
+          )
             .toISOString()
             .substring(0, 19)
             .replace('T', ' ')
