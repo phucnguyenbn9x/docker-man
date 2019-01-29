@@ -13,7 +13,8 @@ app.service(serviceName, function($http) {
   };
   this.addContainer = function(payload, cb) {
     const ADD_CONTAINER =
-      this.baseUrl + `/containers/create?name=${payload.name}`;
+      this.baseUrl +
+      `/containers/create${payload.name ? `?name=${payload.name}` : ''}`;
     httpPost(ADD_CONTAINER, payload, cb);
   };
   this.startContainer = function(payload, cb) {

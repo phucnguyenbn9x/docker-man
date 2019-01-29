@@ -14,12 +14,14 @@
 	<body style="height: 100vh;">
 		<docker-man end-point="http://localhost:2375"></docker-man>
 
+		<script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
 		<script src="./client/vendor/js/jquery.min.js"></script>
 		<script src="./client/vendor/js/angular.min.js"></script>
 		<script src="./client/vendor/js/bootstrap.min.js"></script>
 		<script src="./client/vendor/js/jquery-ui.min.js"></script>
 		<script src="./public/docker-man.bundle.js"></script>
 		<script src="./client/app.js"></script>
+		<script>if (window.module) module = window.module;</script>
 	</body>
 
 </html>

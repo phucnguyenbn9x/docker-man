@@ -85,11 +85,18 @@ module.exports = function(ModalService, apiService, ctnManCtrl, cb) {
         name: self.name
       };
 
-      payload.ExposedPorts[`${self.privatePort}/tcp`] = {};
-      payload.HostConfig.PortBindings[`${self.privatePort}/tcp`] = [];
-      payload.HostConfig.PortBindings[`${self.privatePort}/tcp`][0] = {
-        HostPort: self.publicPort
-      };
+      if (self.privatePort) {
+        payload.ExposedPorts[`${self.privatePort}/tcp`] = {};
+        payload.HostConfig.PortBindings[`${self.privatePort}/tcp`] = [];
+        payload.HostConfig.PortBindings[`${self.privatePort}/tcp`].push({
+          HostPort: ''
+        });
+        if (self.publicPort) {
+          payload.HostConfig.PortBindings[`${self.privatePort}/tcp`][0] = {
+            HostPort: self.publicPort
+          };
+        }
+      }
 
       apiService.addContainer(payload, res => {
         console.log(res.data);
