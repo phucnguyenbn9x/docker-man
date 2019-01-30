@@ -1,16 +1,25 @@
 require('./images-man.less');
 
+const pullImageDialog = require('../../dialogs/pull-image/pull-image');
+
 const moduleName = 'images-man';
 const componentName = 'imagesMan';
 
-function Controller($scope, $element, $http, $filter, apiService) {
+function Controller(
+  $scope,
+  $element,
+  $http,
+  $filter,
+  ModalService,
+  apiService
+) {
   let self = this;
 
   this.$onInit = function() {
     self.title = 'Images';
     self.headerList = ['Tags', 'Size', 'Created'];
     self.actions = [{name: 'Update', handle: self.update}];
-    self.actionsTable = [{name: 'Refresh', handle: self.listImages}];
+    self.actionsTable = [{name: 'Pull image', handle: self.pullImage}];
 
     self.listImages();
 
@@ -33,6 +42,9 @@ function Controller($scope, $element, $http, $filter, apiService) {
         return result;
       });
     });
+  };
+  this.pullImage = function() {
+    pullImageDialog(ModalService, apiService, self);
   };
 
   this.update = function(image) {

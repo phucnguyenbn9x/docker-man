@@ -1,15 +1,24 @@
 require('./volumes-man.less');
 
+const addVolumeDialog = require('../../dialogs/add-volume/add-volume');
+
 const moduleName = 'volumes-man';
 const componentName = 'volumesMan';
 
-function Controller($scope, $element, $http, $filter, apiService) {
+function Controller(
+  $scope,
+  $element,
+  $http,
+  $filter,
+  ModalService,
+  apiService
+) {
   let self = this;
 
   this.$onInit = function() {
     self.title = 'Volumes';
     self.headerList = ['Name', 'Mountpoint', 'CreatedAt'];
-    self.actionsTable = [{name: 'Refresh', handle: self.listVolumes}];
+    self.actionsTable = [{name: 'Add volume', handle: self.addVolume}];
 
     self.listVolumes();
 
@@ -32,6 +41,9 @@ function Controller($scope, $element, $http, $filter, apiService) {
         return result;
       });
     });
+  };
+  this.addVolume = () => {
+    addVolumeDialog(ModalService, apiService, self);
   };
 }
 

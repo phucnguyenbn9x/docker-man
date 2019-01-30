@@ -63,6 +63,10 @@ app.service(serviceName, function($http) {
     const LIST_VOLUMES = this.baseUrl + '/volumes';
     httpGet(LIST_VOLUMES, cb);
   };
+  this.createVolume = (payload, cb) => {
+    const CREATE_VOLUME = this.baseUrl + '/volumes/create';
+    httpPost(CREATE_VOLUME, payload, cb);
+  };
 
   function httpGet(url, cb) {
     let reqOptions = {
