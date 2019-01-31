@@ -81,7 +81,7 @@ app.service(serviceName, function($http) {
         cb(result);
       },
       err => {
-        console.log(err);
+        cb(null, err);
       }
     );
   }
@@ -98,7 +98,9 @@ app.service(serviceName, function($http) {
       result => {
         cb(result);
       },
-      err => {}
+      err => {
+        cb(null, err);
+      }
     );
   }
   function httpDelete(url, cb) {
@@ -114,7 +116,7 @@ app.service(serviceName, function($http) {
         cb(result);
       },
       err => {
-        console.log(err);
+        cb(null, err);
       }
     );
   }

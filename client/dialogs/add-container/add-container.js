@@ -10,6 +10,9 @@ module.exports = function(ModalService, apiService, ctnManCtrl, cb) {
     };
 
     this.addContainer = function() {
+      let colonIndex = self.image.lastIndexOf(':');
+      let image = colonIndex > 0 ? self.image : `${self.image}:latest`;
+
       let payload = {
         Cmd: [],
         Env: [],
@@ -66,7 +69,7 @@ module.exports = function(ModalService, apiService, ctnManCtrl, cb) {
             Name: 'no'
           }
         },
-        Image: self.image,
+        Image: image,
         Labels: {},
         MacAddress: '',
         NetworkingConfig: {
@@ -98,10 +101,30 @@ module.exports = function(ModalService, apiService, ctnManCtrl, cb) {
         }
       }
 
-      apiService.addContainer(payload, res => {
-        console.log(res.data);
-        ctnManCtrl.start(res.data);
+      apiService.listImages(res => {
+        if (
+          res.data.some(img => {
+            return img.RepoTags.includes(image);
+          })
+        ) {
+          apiService.addContainer(payload, res => {
+            ctnManCtrl.start(res.data);
+          });
+        } else {
+          colonIndex = image.lastIndexOf(':');
+          let imgInfo = {
+            fromImage: colonIndex > 0 ? image.slice(0, colonIndex) : image,
+            tag: colonIndex > 0 ? image.slice(colonIndex + 1) : 'latest'
+          };
+          apiService.createImage(imgInfo, res => {
+            console.log('test');
+            apiService.addContainer(payload, res => {
+              ctnManCtrl.start(res.data);
+            });
+          });
+        }
       });
+
       self.closeModal();
     };
   }
