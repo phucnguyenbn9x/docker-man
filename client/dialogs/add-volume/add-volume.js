@@ -1,5 +1,4 @@
 const helper = require('../dialog-helper');
-require('./add-volume.less');
 
 module.exports = function(ModalService, apiService, volManCtrl, cb) {
   function modalCtrl($scope, close) {

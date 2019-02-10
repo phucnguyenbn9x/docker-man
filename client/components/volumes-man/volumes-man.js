@@ -1,5 +1,3 @@
-require('./volumes-man.less');
-
 const addVolumeDialog = require('../../dialogs/add-volume/add-volume');
 
 const moduleName = 'volumes-man';

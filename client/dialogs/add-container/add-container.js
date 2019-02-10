@@ -1,5 +1,4 @@
 const helper = require('../dialog-helper');
-require('./add-container.less');
 
 module.exports = function(ModalService, apiService, ctnManCtrl, cb) {
   function modalCtrl($scope, close) {

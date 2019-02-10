@@ -1,5 +1,4 @@
 const helper = require('../dialog-helper');
-require('./pull-image.less');
 
 module.exports = function(ModalService, apiService, imgManCtrl, cb) {
   function modalCtrl($scope, close) {

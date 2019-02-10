@@ -1,5 +1,3 @@
-require('./containers-man.less');
-
 const addContainerDialog = require('../../dialogs/add-container/add-container');
 
 const moduleName = 'containers-man';

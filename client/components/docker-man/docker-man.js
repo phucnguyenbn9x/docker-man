@@ -1,7 +1,5 @@
 require('../../vendor/js/angular-modal-service.min');
 
-require('./docker-man.less');
-
 const apiServiceMd = require('../../services/api-service').name;
 
 const dcFiltersMd = require('../../filters/dc-filters').name;

@@ -1,5 +1,3 @@
-require('./images-man.less');
-
 const pullImageDialog = require('../../dialogs/pull-image/pull-image');
 
 const moduleName = 'images-man';
