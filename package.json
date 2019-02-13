@@ -5,9 +5,8 @@
   "main": "main.js",
   "scripts": {
     "start": "node server/app.js",
-    "window": "electron .",
     "package-app-linux": "electron-packager . docker-man --overwrite --asar --platform=linux --arch=x64 --prune=true --out=native-app",
-    "package-app-windows": "electron-packager . docker-man --overwrite --asar --platform=win32 --arch=x64 --prune=true --out=native-app",
+    "package-app-windows": "electron-packager . docker-man --platform win32 --arch x64 --out native-app/",
     "create-installer-linux": "electron-installer-debian --src native-app/docker-man-linux-x64/ --arch amd64 --config debian.json",
     "create-installer-windows": "electron-installer-windows --src native-app/docker-man-win32-x64/ --dest native-app/",
     "build": "webpack --mode=production",
