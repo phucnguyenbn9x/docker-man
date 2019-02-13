@@ -22,7 +22,7 @@ function Controller(
     self.listImages();
 
     self.updateImgListId = setInterval(function() {
-      self.listImages();
+      self.updateImages();
     }, 5000);
   };
   this.$onDestroy = function() {
@@ -38,6 +38,18 @@ function Controller(
           Created: $filter('formatDate')(elem.Created)
         };
         return result;
+      });
+    });
+  };
+  this.updateImages = function() {
+    apiService.listImages(res => {
+      res.data.forEach((elem, idx) => {
+        let tmp = {
+          Tags: elem.RepoTags,
+          Size: $filter('formatSize')(elem.Size),
+          Created: $filter('formatDate')(elem.Created)
+        };
+        angular.copy(tmp, self.itemList[idx]);
       });
     });
   };

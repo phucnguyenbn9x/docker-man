@@ -12,6 +12,9 @@ function Controller($scope, $element) {
 
   this.click = function(ctn, $event) {
     self.selectedList = [ctn];
+    self.clickHandler && self.clickHandler(ctn);
+    let idx = self.itemList.indexOf(ctn);
+    self.toggleRow(idx);
     // let indexInSelectedList = self.selectedList.indexOf(ctn);
 
     // if ($event && $event.shiftKey) {
@@ -48,8 +51,13 @@ function Controller($scope, $element) {
     // self.selectedList = [ctn];
   };
 
-  this.isSelected = function(item) {
-    return self.selectedList.indexOf(item) !== -1;
+  this.toggleRow = function(idx) {
+    if (self.itemList[idx].selected != undefined)
+      self.itemList[idx].selected = !self.itemList[idx].selected;
+  };
+
+  this.isSelected = function(idx) {
+    return self.itemList[idx] && self.itemList[idx].selected;
   };
 }
 
@@ -63,7 +71,8 @@ app.component(componentName, {
     itemList: '<',
     headerList: '<',
     actions: '<',
-    containerCtrl: '<'
+    containerCtrl: '<',
+    clickHandler: '<'
   }
 });
 

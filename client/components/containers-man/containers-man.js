@@ -30,7 +30,7 @@ function Controller(
     self.listContainers();
 
     self.updateCtnListId = setInterval(function() {
-      self.listContainers();
+      self.updateContainers();
     }, 5000);
   };
 
@@ -38,6 +38,30 @@ function Controller(
     clearInterval(self.updateCtnListId);
   };
 
+  this.updateContainers = function() {
+    apiService.listContainers(res => {
+      self.itemList = res.data.map((elem, idx) => {
+        let tmp = {
+          Id: elem.Id,
+          Name: elem.Names[0],
+          State: elem.State,
+          Image: elem.Image,
+          Created: $filter('formatDate')(elem.Created),
+          Ports:
+            elem.Ports.length > 0
+              ? `${elem.Ports[0].PublicPort ? elem.Ports[0].PublicPort : '-'}:${
+                  elem.Ports[0].PrivatePort
+                }`
+              : '--',
+          selected: self.itemList[idx]
+            ? self.itemList[idx].selected || false
+            : false,
+          Stats: self.itemList[idx] ? self.itemList[idx].Stats : []
+        };
+        return tmp;
+      });
+    });
+  };
   this.listContainers = function() {
     apiService.listContainers(res => {
       self.itemList = res.data.map(elem => {
@@ -52,11 +76,36 @@ function Controller(
               ? `${elem.Ports[0].PublicPort ? elem.Ports[0].PublicPort : '-'}:${
                   elem.Ports[0].PrivatePort
                 }`
-              : '--'
+              : '--',
+          selected: false
         };
         return result;
       });
     });
+  };
+  this.clickContainer = function(ctn) {
+    self.getStatusContainer(ctn);
+  };
+  this.getStatusContainer = function(ctn, cb) {
+    let idx = self.itemList.indexOf(ctn);
+    if (ctn.State != 'running') {
+      delete self.itemList[idx].selected;
+      return;
+    }
+    if (!ctn.selected) {
+      apiService.statusContainer(ctn, res => {
+        self.itemList[idx].Stats = [];
+        self.itemList[idx].Stats.push([
+          'Memory',
+          res.data.memory_stats.usage || ''
+        ]);
+        self.itemList[idx].Stats.push([
+          'Cache',
+          res.data.memory_stats.stats ? res.data.memory_stats.stats.cache : ''
+        ]);
+        cb && cb();
+      });
+    }
   };
   this.addContainer = function() {
     addContainerDialog(ModalService, apiService, self);
@@ -64,37 +113,38 @@ function Controller(
   this.start = function(ctn) {
     if (!ctn) return;
     apiService.startContainer(ctn, res => {
-      self.listContainers();
+      self.updateContainers();
     });
   };
   this.stop = function(ctn) {
     if (!ctn) return;
+    ctn.selected = false;
     apiService.stopContainer(ctn, res => {
-      self.listContainers();
+      self.updateContainers();
     });
   };
   this.restart = function(ctn) {
     if (!ctn) return;
     apiService.restartContainer(ctn, res => {
-      self.listContainers();
+      self.updateContainers();
     });
   };
   this.pause = function(ctn) {
     if (!ctn) return;
     apiService.pauseContainer(ctn, res => {
-      self.listContainers();
+      self.updateContainers();
     });
   };
   this.resume = function(ctn) {
     if (!ctn) return;
     apiService.resumeContainer(ctn, res => {
-      self.listContainers();
+      self.updateContainers();
     });
   };
   this.remove = function(ctn) {
     if (!ctn) return;
     apiService.removeContainer(ctn, res => {
-      self.listContainers();
+      self.updateContainers();
     });
   };
 }

@@ -15,13 +15,13 @@ function Controller(
 
   this.$onInit = function() {
     self.title = 'Volumes';
-    self.headerList = ['Name', 'Mountpoint', 'CreatedAt'];
+    self.headerList = ['Name', 'Mountpoint'];
     self.actionsTable = [{name: 'Add volume', handle: self.addVolume}];
 
     self.listVolumes();
 
     self.updateVolListId = setInterval(() => {
-      self.listVolumes();
+      self.updateVolumes();
     }, 5000);
   };
   this.$onDestroy = function() {
@@ -33,10 +33,22 @@ function Controller(
       self.itemList = res.data.Volumes.map(elem => {
         let result = {
           Name: elem.Name,
+          Mountpoint: elem.Mountpoint
+          // CreatedAt: $filter('formatDate')(elem.CreatedAt)
+        };
+        return result;
+      });
+    });
+  };
+  this.updateVolumes = function() {
+    apiService.listVolumes(res => {
+      res.data.Volumes.forEach((elem, idx) => {
+        let tmp = {
+          Name: elem.Name,
           Mountpoint: elem.Mountpoint,
           CreatedAt: $filter('formatDate')(elem.CreatedAt)
         };
-        return result;
+        angular.copy(tmp, self.itemList[idx]);
       });
     });
   };

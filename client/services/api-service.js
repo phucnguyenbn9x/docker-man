@@ -11,6 +11,11 @@ app.service(serviceName, function($http) {
     const LIST_CONTAINER = this.baseUrl + '/containers/json?all=1';
     httpGet(LIST_CONTAINER, cb);
   };
+  this.statusContainer = function(payload, cb) {
+    const STATUS_CONTAINER =
+      this.baseUrl + `/containers/${payload.Id}/stats?stream=false`;
+    httpGet(STATUS_CONTAINER, cb);
+  };
   this.addContainer = function(payload, cb) {
     const ADD_CONTAINER =
       this.baseUrl +
