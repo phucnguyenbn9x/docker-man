@@ -42,16 +42,7 @@ function Controller(
     });
   };
   this.updateImages = function() {
-    apiService.listImages(res => {
-      res.data.forEach((elem, idx) => {
-        let tmp = {
-          Tags: elem.RepoTags,
-          Size: $filter('formatSize')(elem.Size),
-          Created: $filter('formatDate')(elem.Created)
-        };
-        angular.copy(tmp, self.itemList[idx]);
-      });
-    });
+    self.listImages();
   };
   this.pullImage = function() {
     pullImageDialog(ModalService, apiService, self);

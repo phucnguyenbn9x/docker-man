@@ -16,6 +16,10 @@ app.service(serviceName, function($http) {
       this.baseUrl + `/containers/${payload.Id}/stats?stream=false`;
     httpGet(STATUS_CONTAINER, cb);
   };
+  this.inspectContainer = (payload, cb) => {
+    const INSPECT_CONTAINER = this.baseUrl + `/containers/${payload.Id}/json`;
+    httpGet(INSPECT_CONTAINER, cb);
+  };
   this.addContainer = function(payload, cb) {
     const ADD_CONTAINER =
       this.baseUrl +

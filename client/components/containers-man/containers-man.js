@@ -1,4 +1,5 @@
 const addContainerDialog = require('../../dialogs/add-container/add-container');
+const containerInfoDialog = require('../../dialogs/container-info/container-info');
 
 const moduleName = 'containers-man';
 const componentName = 'containersMan';
@@ -84,7 +85,18 @@ function Controller(
     });
   };
   this.clickContainer = function(ctn) {
-    self.getStatusContainer(ctn);
+    apiService.statusContainer(ctn, res => {
+      let stats = {};
+      stats.Memory = $filter('formatSize')(res.data.memory_stats.usage || 0);
+      stats.Cache = res.data.memory_stats.stats
+        ? $filter('formatSize')(res.data.memory_stats.stats.cache)
+        : 0;
+      ctn.stats = stats;
+      apiService.inspectContainer(ctn, res => {
+        ctn.inspect = res.data;
+        containerInfoDialog(ModalService, apiService, ctn, self, () => {});
+      });
+    });
   };
   this.getStatusContainer = function(ctn, cb) {
     let idx = self.itemList.indexOf(ctn);

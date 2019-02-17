@@ -17,7 +17,7 @@
 			</thead>
 			<tbody class="file-item" ng-repeat="(itemIdx, item) in self.itemList">
 				<tr class="item-list" ng-class="{selected: self.isSelected(item)}">
-					<td ng-repeat="(headerIdx, header) in self.headerList" ng-attr-title="{{ item[header] }}" ng-click="self.click(item, $event)">
+					<td class="hover" ng-repeat="(headerIdx, header) in self.headerList" ng-attr-title="{{ item[header] }}" ng-click="self.click(item, $event)">
 						<span ng-if="header !== 'State'">
 							{{ item[header] }}
 						</span>
@@ -32,10 +32,10 @@
 						</span>
 					</td>
 				</tr>
-				<tr ng-if="self.isSelected(itemIdx)">
-					<td></td>
-					<td ng-repeat="stat in item.Stats">{{ stat[0] }}: {{ stat[1] | formatSize}}</td>
-				</tr>
+				<!-- <tr ng-if="self.isSelected(itemIdx)"> -->
+				<!-- 	<td></td> -->
+				<!-- 	<td ng-repeat="stat in item.Stats">{{ stat[0] }}: {{ stat[1] | formatSize}}</td> -->
+				<!-- </tr> -->
 			</tbody>
 		</table>
 	</div>

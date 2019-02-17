@@ -103,6 +103,7 @@ module.exports = function(ModalService, apiService, ctnManCtrl, cb) {
       apiService.listImages(res => {
         if (
           res.data.some(img => {
+            if (!img.RepoTags) return false;
             return img.RepoTags.includes(image);
           })
         ) {
