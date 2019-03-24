@@ -1,0 +1,7 @@
+{
+  "registry-mirrors": [],
+  "insecure-registries": [],
+  "debug": true,
+  "experimental": false,
+  "api-cors-header": "*"
+}

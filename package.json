@@ -5,6 +5,7 @@
   "main": "main.js",
   "scripts": {
     "start": "node server/app.js",
+	"http-server": "http-server .",
     "package-linux": "electron-packager . docker-man --overwrite --asar --platform linux --arch x64 --prune true --out native-app/",
     "package-windows": "electron-packager . docker-man --overwrite --asar --platform win32 --arch x64 --prune true --out native-app/",
     "setup-linux": "electron-installer-debian --src native-app/docker-man-linux-x64/ --arch amd64 --config debian.json",
