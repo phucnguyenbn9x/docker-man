@@ -42,7 +42,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 
 [Files]
 Source: "{#DockerManPath}"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs; AfterInstall: InstallDockerConfirm
-Source: "{#DaemonJsonPath}"; DestDir: "{#UserFolder}\.docker"; Flags: ignoreversion;
+Source: "{#DaemonJsonPath}"; DestDir: "{#UserFolder}\.docker"; Check: getCheckInstallDocker; Flags: ignoreversion;
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Code]
