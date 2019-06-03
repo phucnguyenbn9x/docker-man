@@ -37,7 +37,7 @@ function Controller(
     apiService.listImages(res => {
       self.itemList = res.data.map(elem => {
         let result = {
-          Tags: elem.RepoTags[0],
+			Tags: elem.RepoTags && Array.isArray(elem.RepoTags) && elem.RepoTags.length > 0 ? elem.RepoTags[0] : '',
           Size: $filter('formatSize')(elem.Size),
           Created: $filter('formatDate')(elem.Created)
         };
