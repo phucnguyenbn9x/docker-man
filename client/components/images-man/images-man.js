@@ -18,7 +18,10 @@ function Controller(
     self.title = 'Images';
     self.headerList = ['Tags', 'Size', 'Created'];
     self.actions = [{name: 'Update', handle: self.update}];
-    self.actionsTable = [{name: 'Pull image', handle: self.pullImage}];
+    self.actionsTable = [
+		// {name: 'Pull image', handle: self.pullImage},
+		{name: 'Update all', handle: self.updateAllImage}
+	];
 
     self.listImages();
 
@@ -65,6 +68,12 @@ function Controller(
       console.log('---Updated');
     });
   };
+
+	this.updateAllImage = function() {
+		self.itemList.forEach(img => {
+			self.update(img);
+		})
+	}
 }
 
 let app = angular.module(moduleName, []);
