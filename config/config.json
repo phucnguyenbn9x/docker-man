@@ -1,0 +1,22 @@
+[
+	{
+		"name": "wi_auth",
+		"registry": "118.70.171.246:30555/wi-auth:local"
+	},
+	{
+		"name": "wi_backend",
+		"registry": "118.70.171.246:30555/wi-backend:local"
+	},
+	{
+		"name": "wi_online_inventory",
+		"registry": "118.70.171.246:30555/wi-online-inventory:local"
+	},
+	{
+		"name": "wi_mysql",
+		"registry": "mysql:latest"
+	},
+	{
+		"name": "wi_redis",
+		"registry": "redis:latest"
+	}
+]

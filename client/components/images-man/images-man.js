@@ -1,4 +1,5 @@
 const pullImageDialog = require('../../dialogs/pull-image/pull-image');
+const config = require('../../../config/config.json');
 
 const moduleName = 'images-man';
 const componentName = 'imagesMan';
@@ -33,12 +34,17 @@ function Controller(
     apiService.listImages(res => {
       self.itemList = res.data.map(elem => {
         let result = {
-          Tags: elem.RepoTags,
+          Tags: elem.RepoTags[0],
           Size: $filter('formatSize')(elem.Size),
           Created: $filter('formatDate')(elem.Created)
         };
         return result;
       });
+		self.itemList = self.itemList.filter(item => {
+			return config.some(elem => {
+				return elem.registry === item.Tags;
+			});
+		})
     });
   };
   this.updateImages = function() {
@@ -49,7 +55,7 @@ function Controller(
   };
 
   this.update = function(image) {
-    let tag = image.Tags[0];
+    let tag = image.Tags;
     let colonIndex = tag.lastIndexOf(':');
     let payload = {
       fromImage: tag.slice(0, colonIndex),

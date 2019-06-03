@@ -1,5 +1,6 @@
 const addContainerDialog = require('../../dialogs/add-container/add-container');
 const containerInfoDialog = require('../../dialogs/container-info/container-info');
+const config = require('../../../config/config.json');
 
 const moduleName = 'containers-man';
 const componentName = 'containersMan';
@@ -33,6 +34,8 @@ function Controller(
     self.updateCtnListId = setInterval(function() {
       self.updateContainers();
     }, 5000);
+
+	console.log(config);
   };
 
   this.$onDestroy = function() {
@@ -61,6 +64,11 @@ function Controller(
         };
         return tmp;
       });
+		self.itemList = self.itemList.filter(item => {
+			return config.some(elem => {
+				return elem.registry === item.Image;
+			})
+		})
     });
   };
   this.listContainers = function() {
@@ -82,6 +90,11 @@ function Controller(
         };
         return result;
       });
+		self.itemList = self.itemList.filter(item => {
+			return config.some(elem => {
+				return elem.registry === item.Image;
+			})
+		})
     });
   };
   this.clickContainer = function(ctn) {

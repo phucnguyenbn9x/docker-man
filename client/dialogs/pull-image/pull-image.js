@@ -12,7 +12,7 @@ module.exports = function(ModalService, apiService, imgManCtrl, cb) {
       let image = self.image;
       let colonIndex = image.lastIndexOf(':');
       let payload = {
-        fromImage: colonIndex > 0 ? image.slice(0, colonIndex) : image,
+        fromImage: `${(colonIndex > 0 ? image.slice(0, colonIndex) : image)}`,
         tag: colonIndex > 0 ? image.slice(colonIndex + 1) : 'latest'
       };
       apiService.createImage(payload, res => {
