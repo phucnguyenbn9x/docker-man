@@ -11,82 +11,9 @@ module.exports = function(ModalService, apiService, ctnManCtrl, cb) {
     this.addContainer = function() {
       let colonIndex = self.image.lastIndexOf(':');
       let image = colonIndex > 0 ? self.image : `${self.image}:latest`;
+	  let network = '';
 
-      let payload = {
-        Cmd: [],
-        Env: [],
-        ExposedPorts: {},
-        HostConfig: {
-          Binds: [],
-          CapAdd: [
-            'AUDIT_WRITE',
-            'CHOWN',
-            'DAC_OVERRIDE',
-            'FOWNER',
-            'FSETID',
-            'KILL',
-            'MKNOD',
-            'NET_BIND_SERVICE',
-            'NET_RAW',
-            'SETFCAP',
-            'SETGID',
-            'SETPCAP',
-            'SETUID',
-            'SYS_CHROOT'
-          ],
-          CapDrop: [
-            'AUDIT_CONTROL',
-            'BLOCK_SUSPEND',
-            'DAC_READ_SEARCH',
-            'IPC_LOCK',
-            'IPC_OWNER',
-            'LEASE',
-            'LINUX_IMMUTABLE',
-            'MAC_ADMIN',
-            'MAC_OVERRIDE',
-            'NET_ADMIN',
-            'NET_BROADCAST',
-            'SYSLOG',
-            'SYS_ADMIN',
-            'SYS_BOOT',
-            'SYS_MODULE',
-            'SYS_NICE',
-            'SYS_PACCT',
-            'SYS_PTRACE',
-            'SYS_RAWIO',
-            'SYS_RESOURCE',
-            'SYS_TIME',
-            'SYS_TTY_CONFIG',
-            'WAKE_ALARM'
-          ],
-          Devices: [],
-          NetworkMode: 'bridge',
-          PortBindings: {},
-          Privileged: false,
-          PublishAllPorts: false,
-          RestartPolicy: {
-            Name: 'no'
-          }
-        },
-        Image: image,
-        Labels: {},
-        MacAddress: '',
-        NetworkingConfig: {
-          EndpointsConfig: {
-            bridge: {
-              IPAMConfig: {
-                IPv4Address: '',
-                IPv6Address: ''
-              }
-            }
-          }
-        },
-        OpenStdin: false,
-        Tty: false,
-        Volumes: {},
-        name: self.name
-      };
-
+      let payload = apiService.getNewContainerPayload(self.name, image);
       if (self.privatePort) {
         payload.ExposedPorts[`${self.privatePort}/tcp`] = {};
         payload.HostConfig.PortBindings[`${self.privatePort}/tcp`] = [];
