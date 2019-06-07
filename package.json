@@ -28,7 +28,6 @@
     "asar": "^0.14.6",
     "css-loader": "^2.1.0",
     "electron": "^3.1.2",
-    "electron-installer-debian": "^1.1.0",
     "electron-installer-windows": "^1.1.0",
     "electron-packager": "^13.0.1",
     "file-loader": "^3.0.1",

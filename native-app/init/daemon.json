@@ -1,0 +1,6 @@
+{
+  "insecure-registries": [
+    "118.70.171.246:30555"
+  ],
+  "api-cors-header": "*"
+}

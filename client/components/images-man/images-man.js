@@ -75,8 +75,8 @@ function Controller(
 					let inspect = res.data;
 					let payload = {
 						...inspect.Config,
-						HostConfig: inspect.HostPort,
-						NetworkingConfig: inspect.NetworkingConfig
+						HostConfig: inspect.HostConfig,
+						NetworkingConfig: inspect.NetworkSettings
 					}
 					payload.name = inspect.Name.substr(1);
 

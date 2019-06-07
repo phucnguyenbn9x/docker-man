@@ -8,12 +8,12 @@
 #define MyAppExeName "docker-man.exe"
 
 #define UserFolder "{userappdata}\..\.."
-
-#define DockerManPath "D:\well-insight\docker-man\native-app\docker-man-win32-x64\*"
+#define ProjectPath "{pf}"
+#define DockerManPath "E:\workspace\docker-man\native-app\docker-man-win32-x64\*"
 #define Docker "Docker for Windows Installer.exe"
-#define DockerPath "D:\well-insight\docker-man\native-app\prerequisites\Docker for Windows Installer.exe"
+#define DockerPath "E:\workspace\docker-man\native-app\prerequisites\Docker for Windows Installer.exe"
 #define DockerUrl "https://download.docker.com/win/stable/Docker%20for%20Windows%20Installer.exe"
-#define DaemonJsonPath "D:\well-insight\docker-man\native-app\prerequisites\daemon.json"
+#define DaemonJsonPath "E:\workspace\docker-man\native-app\prerequisites\daemon.json"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
@@ -29,7 +29,7 @@ AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 DefaultDirName={pf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
-OutputDir=D:\well-insight\docker-man\native-app
+OutputDir=E:\workspace\docker-man\native-app
 OutputBaseFilename=DockerMan-Setup
 Compression=lzma
 SolidCompression=yes
@@ -41,8 +41,8 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "{#DockerManPath}"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs; AfterInstall: InstallDockerConfirm
-Source: "{#DaemonJsonPath}"; DestDir: "{#UserFolder}\.docker"; Check: getCheckInstallDocker; Flags: ignoreversion;
+Source: {#DockerManPath}; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs; BeforeInstall: InstallDockerConfirm;
+Source: "{#DaemonJsonPath}"; DestDir: "{#UserFolder}\.docker"; Flags: ignoreversion;
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Code]
@@ -58,6 +58,8 @@ begin
   Result := True;
 end;
 
+procedure ExitProcess(uExitCode: Integer);
+  external 'ExitProcess@kernel32.dll stdcall';
 var
   dockerChecked: Boolean;
 procedure InstallDockerConfirm;
@@ -65,37 +67,11 @@ var
   ErrCode: Integer;
 begin
   if not dockerChecked and checkInstallDocker then begin
-    checkInstallDocker := MsgBox('Can not find Docker Desktop!' + #13#10 + #13#10 + 'Download it now?', mbConfirmation, MB_YESNO) = idYes;
-    if checkInstallDocker then begin
-      ShellExec('open', '{#DockerUrl}', '', '', SW_SHOW, ewNoWait, ErrCode);
-    end;
-    dockerChecked := True;
+    SuppressibleMsgBox('Docker is required. You need install Docker before install DockerMan', mbError, MB_OK, MB_OK);
+    ExitProcess(1);
   end;
 end;
 
-procedure InstallDocker;
-var
-  ResultCode: Integer;
-  ErrCode: Integer;
-begin
-  if not Exec(ExpandConstant('{app}\{#Docker}'), '', '', SW_SHOWNORMAL, ewWaitUntilTerminated, ResultCode) then begin
-    MsgBox('Can not install Docker', mbError, MB_OK);
-  end;
-end;
-
-procedure CurStepChanged(CurStep: TSetupStep);
-begin
-  if CurStep = ssDone then begin
-    if checkInstallDocker then begin
-      DeleteFile(ExpandConstant('{app}\{#Docker}'));
-    end;
-  end;
-end;
-
-function getCheckInstallDocker(): Boolean;
-begin
-  Result := checkInstallDocker;
-end;
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
@@ -103,5 +79,8 @@ Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
 Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 
 [Run]
+Filename: "{app}\init\run.bat"; Flags: waituntilterminated runascurrentuser
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 
+[UninstallRun]
+Filename: "{app}\init\stop.bat"; Flags: waituntilterminated
