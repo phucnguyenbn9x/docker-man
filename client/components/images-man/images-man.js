@@ -64,19 +64,47 @@ function Controller(
 			fromImage: tag.slice(0, colonIndex),
 			tag: tag.slice(colonIndex + 1)
 		};
-		let imageConfig = config.find(image => {
-			return image.image == tag;
-		})
-		apiService.createImage(createImagePayload, res => {
-			console.log('---Updated');
-			let newContainerPayload = apiService.getNewContainerPayload(imageConfig.container_name, 
-				tag, imageConfig.networks, imageConfig.ports, imageConfig.environment)
-            apiService.addContainer(newContainerPayload, res => {
-				apiService.startContainer(res.data, res => {
-					console.log('---Done');
+		let preContainer;
+		apiService.listContainers(res => {
+			let listContainers = res.data;
+			preContainer = listContainers.find(c => {
+				return c.Image == tag;
+			})
+			if (preContainer) {
+				apiService.inspectContainer({Id: preContainer.Id}, res => {
+					let inspect = res.data;
+					let payload = {
+						...inspect.Config,
+						HostConfig: inspect.HostPort,
+						NetworkingConfig: inspect.NetworkingConfig
+					}
+					payload.name = inspect.Name.substr(1);
+
+					apiService.removeContainer({Id: preContainer.Id}, res => {
+						apiService.createImage(createImagePayload, res => {
+							apiService.addContainer(payload, res => {
+								apiService.startContainer(res.data, res => {
+									console.log('---Done');
+								});
+							});
+						});
+					})
 				});
-            });
-		});
+			} else {
+				let imageConfig = config.find(image => {
+					return image.image == tag;
+				})
+				apiService.createImage(createImagePayload, res => {
+					let newContainerPayload = apiService.getNewContainerPayload(imageConfig.container_name, 
+						tag, imageConfig.networks, imageConfig.ports, imageConfig.environment)
+					apiService.addContainer(newContainerPayload, res => {
+						apiService.startContainer(res.data, res => {
+							console.log('---Done');
+						});
+					});
+				});
+			}
+		})
 	};
 
 	this.updateAllImage = function() {
