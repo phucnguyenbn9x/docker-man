@@ -77,7 +77,7 @@ app.service(serviceName, function($http) {
 		httpPost(CREATE_VOLUME, payload, cb);
 	};
 
-	this.getNewContainerPayload = function(name, image, network = 'bridge', ports, env = []) {
+	this.getNewContainerPayload = function(name = '', image, network = 'bridge', ports, env = []) {
 		let result = {
 			Cmd: [],
 			Env: env,

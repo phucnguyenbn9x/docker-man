@@ -69,9 +69,9 @@ function Controller(
 		})
 		apiService.createImage(createImagePayload, res => {
 			console.log('---Updated');
-			let createContainerPayload = apiService.getNewContainerPayload(imageConfig.name, 
+			let newContainerPayload = apiService.getNewContainerPayload(imageConfig.container_name, 
 				tag, imageConfig.networks, imageConfig.ports, imageConfig.environment)
-            apiService.addContainer(createContainerPayload, res => {
+            apiService.addContainer(newContainerPayload, res => {
 				apiService.startContainer(res.data, res => {
 					console.log('---Done');
 				});

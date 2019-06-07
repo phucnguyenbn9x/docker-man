@@ -1,6 +1,6 @@
 const addContainerDialog = require('../../dialogs/add-container/add-container');
 const containerInfoDialog = require('../../dialogs/container-info/container-info');
-const config = require('../../../config/config.json');
+const config = require('../../../config/docker-compose.json');
 
 const moduleName = 'containers-man';
 const componentName = 'containersMan';
@@ -90,7 +90,7 @@ function Controller(
 			});
 			self.itemList = self.itemList.filter(item => {
 				return config.some(elem => {
-					return elem.registry === item.Image;
+					return elem.image === item.Image;
 				})
 			})
 		});
