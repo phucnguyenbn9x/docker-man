@@ -1,0 +1,205 @@
+version: "3.3"
+services:
+  wi_mysql:
+    container_name: wi_mysql
+    image: mysql:5.7
+    restart: always
+    command: --init-file /data/application/init.sql
+    environment:
+      MYSQL_PASSWORD: "qwertyuiop"
+      MYSQL_ROOT_PASSWORD: "qwertyuiop"
+    ports:
+      - "3306:3306"
+    expose:
+      - "3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+    volumes:
+      - ./initdb/init.sql:/data/application/init.sql
+      - /tmp/docker-local/mysql:/var/lib/mysql
+    networks:
+      - i2g
+  wi_redis:
+    container_name: wi_redis
+    image: redis:latest
+    restart: always
+    ports:
+      - "6379:6379"
+    expose:
+      - "6379"
+    networks:
+      - i2g
+  wi_auth:
+    container_name: wi_auth
+    image: ${REGISTRY_URL}/wi-auth:${I2G_VERSION}
+    restart: always
+    depends_on:
+      - wi_mysql
+    environment:
+      AUTH_PORT: "2999"
+      AUTH_DBNAME: "wi_auth"
+      AUTH_DBUSER: "i2g"
+      AUTH_DBPASSWORD: "qwertyuiop"
+      AUTH_DBHOST: wi_mysql
+      AUTH_DBDIALECT: "mysql"
+      AUTH_DBPORT: "3306"
+      AUTH_DBSTORAGE: "/tmp/wi_backend.sqlite"
+    ports:
+      - "2999:2999"
+    expose:
+      - "2999"
+    networks:
+      - i2g
+  wi_online_inventory:
+    container_name: wi_online_inventory
+    image: ${REGISTRY_URL}/wi-online-inventory:${I2G_VERSION}
+    restart: always
+    depends_on:
+      - wi_mysql
+    environment:
+      INVENTORY_PORT: "9000"
+      INVENTORY_DBNAME: "inventory"
+      INVENTORY_DBUSER: "i2g"
+      INVENTORY_DBPASSWORD: "qwertyuiop"
+      INVENTORY_DBHOST: wi_mysql
+      INVENTORY_DIALECT: "mysql"
+      INVENTORY_DBPORT: "3306"
+      INVENTORY_JWTKEY: "secretKey"
+      INVENTORY_DATAPATH: "/app/data/curve"
+      INVENTORY_EXPORTPATH: "/app/data/export"
+      INVENTORY_MQTT_BROKER: "wss://mqtt-broker.i2g.cloud"
+    ports:
+      - "3002:9000"
+    expose:
+      - "3002"
+    networks:
+      - i2g
+    volumes:
+      - /tmp/docker-local/wi-inventory/data/curve:/app/data/curve
+      - /tmp/docker-local/wi-inventory/data/export:/app/data/export
+      - /tmp/docker-local/wi-inventory/data/uploads:/app/uploads
+  wi_backend:
+    container_name: wi_backend
+    image: ${REGISTRY_URL}/wi-backend:${I2G_VERSION}
+    restart: always
+    depends_on:
+      - wi_mysql
+      - wi_redis
+    environment:
+      BACKEND_PORT: "3000"
+      BACKEND_DBNAME: "wi_backend"
+      BACKEND_DBUSER: "i2g"
+      BACKEND_DBPASSWORD: "qwertyuiop"
+      BACKEND_DBHOST: wi_mysql
+      BACKEND_DBDIALECT: "mysql"
+      BACKEND_DBPORT: "3306"
+      BACKEND_DBPREFIX: "wi1004_"
+      BACKEND_DBSTORAGE: "/tmp/wi_backend.sqlite"
+      BACKEND_REDIS_HOST: wi_redis
+      BACKEND_REDIS_PORT: "6379"
+      BACKEND_AUTH_SERVICE: "http://wi_auth:2999"
+      BACKEND_INV_SERVICE: "http://wi_online_inventory:9000"
+      BACKEND_CSV_SERVICE: "http://csv_transformer:8000"
+      LOGGING_SERVICE: "http://logger.dev.i2g.cloud"
+      BACKEND_ELASTICSEARCH: "http://elasticsearch"
+      BACKEND_MQTT_BROKER: "wss://mqtt-broker.i2g.cloud"
+      BACKEND_CURVE_BASE_PATH: "/app/data/curve"
+      BACKEND_IMAGE_BASE_PATH: "/app/data/image"
+      BACKEND_EXPORT_PATH: "/app/data/export"
+      BACKEND_USER_LOG_PATH: "/app/data/user-log"
+      BACKEND_USER_UPLOAD_PATH: "/app/data/uploads"
+      BACKEND_JWTKEY: "secretKey"
+    ports:
+      - "3000:3000"
+    expose:
+      - "3000"
+    networks:
+      - i2g
+    volumes:
+      - /tmp/docker-local/wi-backend/curve:/app/data/curve
+      - /tmp/docker-local/wi-backend/image:/app/data/image
+      - /tmp/docker-local/wi-backend/export:/app/data/export
+      - /tmp/docker-local/wi-backend/user-log:/app/data/user-log
+      - /tmp/docker-local/wi-backend/uploads:/app/data/uploads
+  wi_python_backend:
+    container_name: wi_python_backend
+    image: ${REGISTRY_URL}/wi-python-backend:${I2G_VERSION}
+    restart: always
+    depends_on:
+      - wi_mysql
+      - wi_redis
+    environment:
+      PYTHON_PORT: "3000"
+      PYTHON_ENV: "local"
+      PYTHON_PROJECT_STORAGE: "/app/storage"
+      PYTHON_LOG_PATH: "/app/logs"
+      PYTHON_EXPORT_PATH: "/app/exports"
+      PYTHON_CLIENT_DOMAIN: "http://localhost:8080"
+      PROJECT_RELATED_ROOT_URL: "http://wi_backend:3000"
+      USER_RELATED_ROOT_URL: "http://wi_auth:2999"
+      PYTHON_DOWNLOAD_BASE_URL: "http://localhost:3003"
+    ports:
+      - "3003:3000"
+    expose:
+      - "3003"
+    networks:
+      - i2g
+    volumes:
+      - /tmp/docker-local/wi-python-backend/storage:/app/storage
+      - /tmp/docker-local/wi-python-backend/logs:/app/logs
+      - /tmp/docker-local/wi-python-backend/exports:/app/exports
+  wi_angular:
+    container_name: wi_angular
+    image: ${REGISTRY_URL}/wi-angular:${I2G_VERSION}
+    restart: always
+    environment:
+      NODE_ENV: "local"
+    ports:
+      - "80:80"
+    networks:
+      - i2g
+  wi_python_fronend:
+    container_name: wi_python_fronend
+    image: ${REGISTRY_URL}/wi-python-frontend:${I2G_VERSION}
+    restart: always
+    environment:
+      NODE_ENV: "local"
+    ports:
+      - "81:80"
+    networks:
+      - i2g
+  # wi_file_browser_backend:
+  #   container_name: wi_file_browser_backend
+  #   build: ../file-browser-backend
+  #   image: file-browser-backend:latest
+  #   restart: always
+  #   environment:
+  #     NODE_ENV: "production"
+  #     STORAGE_ACCESS_KEY: ""
+  #     STORAGE_SECRET_KEY: ""
+  #     STORAGE_S3: "true"
+  #     STORAGE_BUCKET: ""
+  #     STORAGE_MAXSIZE_TEXT: "100"
+  #   ports:
+  #     - "3001:3001"
+  #   user: "${UID_GID}"
+  #   expose:
+  #     - "3001"
+  #   networks:
+  #     - i2g
+  #   volumes:
+  #     - /var/lib/docker-local/file-browser:/tmp/file-browser
+  # csv_transformer:
+  #   container_name: csv_transformer
+  #   image: csv-transformer:latest
+  #   build: ../csv-transformer
+  #   restart: always
+  #   ports:
+  #     - "3003:8000"
+  #   networks:
+  #     - i2g
+networks:
+  i2g:
+    driver: bridge
