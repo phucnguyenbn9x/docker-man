@@ -18,7 +18,23 @@ services:
       retries: 10
     volumes:
       - ./initdb/init.sql:/data/application/init.sql
-      - /tmp/docker-local/mysql:/var/lib/mysql
+      - /var/lib/docker-local/mysql:/var/lib/mysql
+    networks:
+      - i2g
+  wi_mongo:
+    container_name: wi_mongo
+    image: mongo:4.0
+    restart: always
+    environment:
+      MONGO_DATA_DIR: /data/db
+      MONGO_LOG_DIR: /dev/null
+    command: mongod --smallfiles --logpath=/dev/null
+    ports:
+      - "27017:27017"
+    expose:
+      - "27017"
+    volumes:
+      - /var/lib/docker-local/mongo:/data/db
     networks:
       - i2g
   wi_redis:
@@ -45,7 +61,7 @@ services:
       AUTH_DBHOST: wi_mysql
       AUTH_DBDIALECT: "mysql"
       AUTH_DBPORT: "3306"
-      AUTH_DBSTORAGE: "/tmp/wi_backend.sqlite"
+      AUTH_DBSTORAGE: "/var/lib/wi_backend.sqlite"
     ports:
       - "2999:2999"
     expose:
@@ -77,9 +93,9 @@ services:
     networks:
       - i2g
     volumes:
-      - /tmp/docker-local/wi-inventory/data/curve:/app/data/curve
-      - /tmp/docker-local/wi-inventory/data/export:/app/data/export
-      - /tmp/docker-local/wi-inventory/data/uploads:/app/uploads
+      - /var/lib/docker-local/wi-inventory/data/curve:/app/data/curve
+      - /var/lib/docker-local/wi-inventory/data/export:/app/data/export
+      - /var/lib/docker-local/wi-inventory/data/uploads:/app/uploads
   wi_backend:
     container_name: wi_backend
     image: ${REGISTRY_URL}/wi-backend:${I2G_VERSION}
@@ -96,7 +112,7 @@ services:
       BACKEND_DBDIALECT: "mysql"
       BACKEND_DBPORT: "3306"
       BACKEND_DBPREFIX: "wi1004_"
-      BACKEND_DBSTORAGE: "/tmp/wi_backend.sqlite"
+      BACKEND_DBSTORAGE: "/var/lib/wi_backend.sqlite"
       BACKEND_REDIS_HOST: wi_redis
       BACKEND_REDIS_PORT: "6379"
       BACKEND_AUTH_SERVICE: "http://wi_auth:2999"
@@ -118,11 +134,11 @@ services:
     networks:
       - i2g
     volumes:
-      - /tmp/docker-local/wi-backend/curve:/app/data/curve
-      - /tmp/docker-local/wi-backend/image:/app/data/image
-      - /tmp/docker-local/wi-backend/export:/app/data/export
-      - /tmp/docker-local/wi-backend/user-log:/app/data/user-log
-      - /tmp/docker-local/wi-backend/uploads:/app/data/uploads
+      - /var/lib/docker-local/wi-backend/curve:/app/data/curve
+      - /var/lib/docker-local/wi-backend/image:/app/data/image
+      - /var/lib/docker-local/wi-backend/export:/app/data/export
+      - /var/lib/docker-local/wi-backend/user-log:/app/data/user-log
+      - /var/lib/docker-local/wi-backend/uploads:/app/data/uploads
   wi_python_backend:
     container_name: wi_python_backend
     image: ${REGISTRY_URL}/wi-python-backend:${I2G_VERSION}
@@ -147,9 +163,9 @@ services:
     networks:
       - i2g
     volumes:
-      - /tmp/docker-local/wi-python-backend/storage:/app/storage
-      - /tmp/docker-local/wi-python-backend/logs:/app/logs
-      - /tmp/docker-local/wi-python-backend/exports:/app/exports
+      - /var/lib/docker-local/wi-python-backend/storage:/app/storage
+      - /var/lib/docker-local/wi-python-backend/logs:/app/logs
+      - /var/lib/docker-local/wi-python-backend/exports:/app/exports
   wi_angular:
     container_name: wi_angular
     image: ${REGISTRY_URL}/wi-angular:${I2G_VERSION}
@@ -160,8 +176,8 @@ services:
       - "80:80"
     networks:
       - i2g
-  wi_python_fronend:
-    container_name: wi_python_fronend
+  wi_python_frontend:
+    container_name: wi_python_frontend
     image: ${REGISTRY_URL}/wi-python-frontend:${I2G_VERSION}
     restart: always
     environment:
@@ -170,6 +186,33 @@ services:
       - "81:80"
     networks:
       - i2g
+  wi_proxy:
+    container_name: wi_proxy
+    image: ${REGISTRY_URL}/wi-proxy:${I2G_VERSION}
+    restart: always
+    environment:
+      NODE_ENV: "local"
+      LOCAL_WI_BACKEND_HOST: "http://wi_backend:3000"
+      LOCAL_WI_AUTH_HOST: "http://wi_auth:2999"
+      REDIS_HOST: wi_redis
+      REDIS_PORT: "6379"
+      REDIS_PASSWORD: ""
+      WI_SYNC_HOST: "http://118.70.171.246:30331"
+      PATH_DOWNLOAD: "/opt/download"
+      CURVE_BASE_PATH: "/opt/curve"
+      MYSQL_HOST: wi_mysql
+      MYSQL_PORT: "3306"
+      MYSQL_USER: "i2g"
+      MYSQL_PASSWORD: "qwertyuiop"
+      MYSQL_PREFIX: "wi1004_"
+      MQTT_HOST: "wss://mqtt-broker.i2g.cloud"
+      MONGO_HOST: "mongodb://wi_mongo:27017/wi-proxy"
+    ports:
+      - "3030:3030"
+    networks:
+      - i2g
+    volumes:
+      - /var/lib/docker-local/wi-backend/curve:/opt/curve
   # wi_file_browser_backend:
   #   container_name: wi_file_browser_backend
   #   build: ../file-browser-backend
@@ -190,7 +233,7 @@ services:
   #   networks:
   #     - i2g
   #   volumes:
-  #     - /var/lib/docker-local/file-browser:/tmp/file-browser
+  #     - /var/lib/docker-local/file-browser:/var/lib/file-browser
   # csv_transformer:
   #   container_name: csv_transformer
   #   image: csv-transformer:latest

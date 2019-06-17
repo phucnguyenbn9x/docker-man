@@ -5,7 +5,7 @@
 		"restart": "always",
 		"command": "--init-file /data/application/init.sql",
 		"environment":
-			[	
+			[
 				"MYSQL_PASSWORD=qwertyuiop",
 				"MYSQL_ROOT_PASSWORD=qwertyuiop"
 			],
@@ -38,7 +38,7 @@
 		"restart": "always",
 		"depends_on": "wi_mysql",
 		"environment":
-			[	
+			[
 				"AUTH_PORT=2999",
 				"AUTH_DBNAME=wi_auth",
 				"AUTH_DBUSER=i2g",
@@ -58,7 +58,7 @@
 		"restart": "always",
 		"depends_on": "wi_mysql",
 		"environment":
-			[	
+			[
 				"INVENTORY_PORT=9000",
       			"INVENTORY_DBNAME=inventory",
       			"INVENTORY_DBUSER=i2g",
@@ -87,7 +87,7 @@
 		"restart": "always",
 		"depends_on": ["wi_mysql", "wi_redis"],
 		"environment":
-			[	
+			[
 				"INVENTORY_PORT=9000",
       			"INVENTORY_DBNAME=inventory",
       			"INVENTORY_DBUSER=i2g",
@@ -109,5 +109,25 @@
 				"${TMP}\\docker-local\\wi-inventory\\data\\export:/app/data/export",
 				"${TMP}\\docker-local\\wi-inventory\\data\\uploads:/app/uploads"
 			]
+	},
+	{
+		"container_name": "wi_angular",
+		"image": "118.70.171.246:30555/wi-angular:local"
+	},
+	{
+		"container_name": "wi_proxy",
+		"image": "118.70.171.246:30555/wi-proxy:local"
+	},
+	{
+		"container_name": "wi_python_backend",
+		"image": "118.70.171.246:30555/wi-python-backend:local"
+	},
+	{
+		"container_name": "wi_python_frontend",
+		"image": "118.70.171.246:30555/wi-python-frontend:local"
+	},
+	{
+		"container_name": "wi_mongo",
+		"image": "mongo"
 	}
 ]
