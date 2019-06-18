@@ -10,6 +10,7 @@ function Controller(
 	$element,
 	$http,
 	$filter,
+    wiLoading,
 	ModalService,
 	apiService
 ) {
@@ -62,14 +63,15 @@ function Controller(
 				};
 				return tmp;
 			});
-			self.itemList = self.itemList.filter(item => {
-				return config.some(elem => {
-					return elem.image === item.Image;
-				})
-			})
+            self.itemList = self.itemList.filter(item => {
+                return config.some(elem => {
+                    return elem.image === item.Image;
+                })
+            })
 		});
 	};
 	this.listContainers = function() {
+        wiLoading.show($element.find('.ctn-man')[0]);
 		apiService.listContainers(res => {
 			self.itemList = res.data.map(elem => {
 				let result = {
@@ -93,6 +95,7 @@ function Controller(
 					return elem.image === item.Image;
 				})
 			})
+            wiLoading.hide();
 		});
 	};
 	this.clickContainer = function(ctn) {
@@ -140,16 +143,20 @@ function Controller(
 		});
 	};
 	this.stop = function(ctn) {
+        wiLoading.show($element.find('ctn-man')[0])
 		if (!ctn) return;
 		ctn.selected = false;
 		apiService.stopContainer(ctn, res => {
 			self.updateContainers();
+            wiLoading.hide();
 		});
 	};
 	this.restart = function(ctn) {
+        wiLoading.show($element.find('ctn-man')[0])
 		if (!ctn) return;
 		apiService.restartContainer(ctn, res => {
 			self.updateContainers();
+            wiLoading.hide();
 		});
 	};
 	this.pause = function(ctn) {
