@@ -21,22 +21,6 @@ services:
       - /var/lib/docker-local/mysql:/var/lib/mysql
     networks:
       - i2g
-  wi_mongo:
-    container_name: wi_mongo
-    image: mongo:4.0
-    restart: always
-    environment:
-      MONGO_DATA_DIR: /data/db
-      MONGO_LOG_DIR: /dev/null
-    command: mongod --smallfiles --logpath=/dev/null
-    ports:
-      - "27017:27017"
-    expose:
-      - "27017"
-    volumes:
-      - /var/lib/docker-local/mongo:/data/db
-    networks:
-      - i2g
   wi_redis:
     container_name: wi_redis
     image: redis:latest
@@ -186,33 +170,16 @@ services:
       - "81:80"
     networks:
       - i2g
-  wi_proxy:
-    container_name: wi_proxy
-    image: ${REGISTRY_URL}/wi-proxy:${I2G_VERSION}
+  wi_base_map:
+    container_name: wi_base_map
+    image: ${REGISTRY_URL}/base-map:${I2G_VERSION}
     restart: always
     environment:
       NODE_ENV: "local"
-      LOCAL_WI_BACKEND_HOST: "http://wi_backend:3000"
-      LOCAL_WI_AUTH_HOST: "http://wi_auth:2999"
-      REDIS_HOST: wi_redis
-      REDIS_PORT: "6379"
-      REDIS_PASSWORD: ""
-      WI_SYNC_HOST: "http://118.70.171.246:30331"
-      PATH_DOWNLOAD: "/opt/download"
-      CURVE_BASE_PATH: "/opt/curve"
-      MYSQL_HOST: wi_mysql
-      MYSQL_PORT: "3306"
-      MYSQL_USER: "i2g"
-      MYSQL_PASSWORD: "qwertyuiop"
-      MYSQL_PREFIX: "wi1004_"
-      MQTT_HOST: "wss://mqtt-broker.i2g.cloud"
-      MONGO_HOST: "mongodb://wi_mongo:27017/wi-proxy"
     ports:
-      - "3030:3030"
+      - "82:80"
     networks:
       - i2g
-    volumes:
-      - /var/lib/docker-local/wi-backend/curve:/opt/curve
   # wi_file_browser_backend:
   #   container_name: wi_file_browser_backend
   #   build: ../file-browser-backend

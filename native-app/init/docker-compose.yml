@@ -123,6 +123,34 @@ services:
       - ${TMP}\docker-local\wi-backend\export:/app/data/export
       - ${TMP}\docker-local\wi-backend\user-log:/app/data/user-log
       - ${TMP}\docker-local\wi-backend\uploads:/app/data/uploads
+
+  wi_python_backend:
+    container_name: wi_python_backend
+    image: ${REGISTRY_URL}/wi-python-backend:${I2G_VERSION}
+    restart: always
+    depends_on:
+      - wi_mysql
+      - wi_redis
+    environment:
+      PYTHON_PORT: "3000"
+      PYTHON_ENV: "local"
+      PYTHON_PROJECT_STORAGE: "/app/storage"
+      PYTHON_LOG_PATH: "/app/logs"
+      PYTHON_EXPORT_PATH: "/app/exports"
+      PYTHON_CLIENT_DOMAIN: "http://localhost:8080"
+      PROJECT_RELATED_ROOT_URL: "http://wi_backend:3000"
+      USER_RELATED_ROOT_URL: "http://wi_auth:2999"
+      PYTHON_DOWNLOAD_BASE_URL: "http://localhost:3003"
+    ports:
+      - "3003:3000"
+    expose:
+      - "3003"
+    networks:
+      - i2g
+    volumes:
+      - ${TMP}\docker-local\wi-python-backend\storage:/app/storage
+      - ${TMP}\docker-local\wi-python-backend\logs:/app/logs
+      - ${TMP}\docker-local\wi-python-backend\exports:/app/exports
   wi_angular:
     container_name: wi_angular
     image: ${REGISTRY_URL}/wi-angular:${I2G_VERSION}
@@ -131,6 +159,26 @@ services:
       NODE_ENV: "local"
     ports:
       - "80:80"
+    networks:
+      - i2g
+  wi_python_frontend:
+    container_name: wi_python_frontend
+    image: ${REGISTRY_URL}/wi-python-frontend:${I2G_VERSION}
+    restart: always
+    environment:
+      NODE_ENV: "local"
+    ports:
+      - "81:80"
+    networks:
+      - i2g
+  wi_base_map:
+    container_name: wi_base_map
+    image: ${REGISTRY_URL}/base-map:${I2G_VERSION}
+    restart: always
+    environment:
+      NODE_ENV: "local"
+    ports:
+      - "82:80"
     networks:
       - i2g
   # wi_file_browser_backend:
