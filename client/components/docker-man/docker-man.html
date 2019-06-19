@@ -1,4 +1,6 @@
-<tool-bar tabs-name="self.tabsName" select-tab="self.selectTab"></tool-bar>
-<containers-man ng-if="self.selectedTab == 'Containers'"></containers-man>
-<images-man ng-if="self.selectedTab == 'Images'"></images-man>
-<volumes-man ng-if="self.selectedTab == 'Volumes'"></volumes-man>
+<div class='main'>
+    <tool-bar tabs-name="self.tabsName" select-tab="self.selectTab"></tool-bar>
+    <containers-man ng-if="self.selectedTab == 'Containers'"></containers-man>
+    <images-man ng-if="self.selectedTab == 'Images'"></images-man>
+    <volumes-man ng-if="self.selectedTab == 'Volumes'"></volumes-man>
+</div>
