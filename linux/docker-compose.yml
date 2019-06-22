@@ -31,6 +31,16 @@ services:
       - "6379"
     networks:
       - i2g
+#  wi_mongo:
+#    container_name: wi_mongo
+#    image: mongo:latest
+#    restart: always
+#    ports:
+#      - "27017:27017"
+#    expose:
+#      - "27017"
+#    networks:
+#      - i2g
   wi_auth:
     container_name: wi_auth
     image: ${REGISTRY_URL}/wi-auth:${I2G_VERSION}
@@ -101,7 +111,7 @@ services:
       BACKEND_REDIS_PORT: "6379"
       BACKEND_AUTH_SERVICE: "http://wi_auth:2999"
       BACKEND_INV_SERVICE: "http://wi_online_inventory:9000"
-      BACKEND_CSV_SERVICE: "http://csv_transformer:8000"
+      BACKEND_CSV_SERVICE: "http://wi_csv_transformer:8000"
       LOGGING_SERVICE: "http://logger.dev.i2g.cloud"
       BACKEND_ELASTICSEARCH: "http://elasticsearch"
       BACKEND_MQTT_BROKER: "wss://mqtt-broker.i2g.cloud"
@@ -135,7 +145,7 @@ services:
       PYTHON_ENV: "local"
       PYTHON_PROJECT_STORAGE: "/app/storage"
       PYTHON_LOG_PATH: "/app/logs"
-      PYTHON_EXPORT_PATH: "/app/exports"
+      PYTHON_EXPORT_PATH: "/app/export"
       PYTHON_CLIENT_DOMAIN: "http://localhost:8080"
       PROJECT_RELATED_ROOT_URL: "http://wi_backend:3000"
       USER_RELATED_ROOT_URL: "http://wi_auth:2999"
@@ -149,7 +159,7 @@ services:
     volumes:
       - /var/lib/docker-local/wi-python-backend/storage:/app/storage
       - /var/lib/docker-local/wi-python-backend/logs:/app/logs
-      - /var/lib/docker-local/wi-python-backend/exports:/app/exports
+      - /var/lib/docker-local/wi-python-backend/export:/app/export
   wi_angular:
     container_name: wi_angular
     image: ${REGISTRY_URL}/wi-angular:${I2G_VERSION}
@@ -180,36 +190,37 @@ services:
       - "82:80"
     networks:
       - i2g
-  # wi_file_browser_backend:
-  #   container_name: wi_file_browser_backend
-  #   build: ../file-browser-backend
-  #   image: file-browser-backend:latest
-  #   restart: always
-  #   environment:
-  #     NODE_ENV: "production"
-  #     STORAGE_ACCESS_KEY: ""
-  #     STORAGE_SECRET_KEY: ""
-  #     STORAGE_S3: "true"
-  #     STORAGE_BUCKET: ""
-  #     STORAGE_MAXSIZE_TEXT: "100"
-  #   ports:
-  #     - "3001:3001"
-  #   user: "${UID_GID}"
-  #   expose:
-  #     - "3001"
-  #   networks:
-  #     - i2g
-  #   volumes:
-  #     - /var/lib/docker-local/file-browser:/var/lib/file-browser
-  # csv_transformer:
-  #   container_name: csv_transformer
-  #   image: csv-transformer:latest
-  #   build: ../csv-transformer
-  #   restart: always
-  #   ports:
-  #     - "3003:8000"
-  #   networks:
-  #     - i2g
+  wi_mqtt:
+    container_name: wi_mqtt
+    image: eclipse-mosquitto
+    restart: always
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    networks:
+      - i2g
+  wi_csv_transformer:
+    container_name: wi_csv_transformer
+    image: ${REGISTRY_URL}/csv-transformer:${I2G_VERSION}
+    restart: always
+    ports:
+      - "3005:8000"
+    networks:
+      - i2g
+#  wi_pm:
+#    container_name: wi_pm
+#    image: ${REGISTRY_URL}/wipm:${I2G_VERSION}
+#    restart: always
+#    depends_on:
+#      - wi_mongo
+#    environment:
+#      MONGO_HOST: wi_mongo
+#      MONGO_PORT: "27017"
+#    ports:
+#      - "5000:5000"
+#      - "5555:5555"
+#    networks:
+#      - i2g
 networks:
   i2g:
     driver: bridge

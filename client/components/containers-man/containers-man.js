@@ -137,9 +137,11 @@ function Controller(
 		addContainerDialog(ModalService, apiService, self);
 	};
 	this.start = function(ctn) {
+		wiLoading.show($element.find('.ctn-man')[0]);
 		if (!ctn) return;
 		apiService.startContainer(ctn, res => {
 			self.updateContainers();
+			wiLoading.hide();
 		});
 	};
 	this.stop = function(ctn) {

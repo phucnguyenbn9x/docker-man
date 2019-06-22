@@ -1,114 +1,23 @@
 [
 	{
 		"container_name": "wi_mysql",
-		"image": "mysql:5.7",
-		"restart": "always",
-		"command": "--init-file /data/application/init.sql",
-		"environment":
-		[
-			"MYSQL_PASSWORD=qwertyuiop",
-			"MYSQL_ROOT_PASSWORD=qwertyuiop"
-		],
-		"ports": "3306:3306",
-		"expose": "3306",
-		"healthcheck":
-		{
-			"test": "['CMD', 'mysqladmin' ,'ping', '-h', 'localhost']",
-			"timeout": "20s",
-			"retries": 10
-		},
-		"volumes":
-		[
-			".\\initdb\\init.sql:/data/application/init.sql",
-			"${TMP}\\docker-local\\mysql:/var/lib/mysql"
-		],
-		"networks": "i2g"
+		"image": "mysql:5.7"
 	},
 	{
 		"container_name": "wi_redis",
-		"image": "redis:latest",
-		"restart": "always",
-		"ports": "6379:6379",
-		"expose": "6379",
-		"networks": "i2g"
+		"image": "redis:latest"
 	},
 	{
 		"container_name": "wi_auth",
-		"image": "118.70.171.246:30555/wi-auth:local",
-		"restart": "always",
-		"depends_on": "wi_mysql",
-		"environment":
-		[
-			"AUTH_PORT=2999",
-			"AUTH_DBNAME=wi_auth",
-			"AUTH_DBUSER=i2g",
-			"AUTH_DBPASSWORD=qwertyuiop",
-			"AUTH_DBHOST=wi_mysql",
-			"AUTH_DBDIALECT=mysql",
-			"AUTH_DBPORT=3306",
-			"AUTH_DBSTORAGE=/tmp/wi_backend.sqlite"
-		],
-		"ports": "2999:2999",
-		"expose": "2999",
-		"networks": "i2g"
+		"image": "118.70.171.246:30555/wi-auth:local"
 	},
 	{
 		"container_name": "wi_online_inventory",
-		"image": "118.70.171.246:30555/wi-online-inventory:local",
-		"restart": "always",
-		"depends_on": "wi_mysql",
-		"environment":
-		[
-			"INVENTORY_PORT=9000",
-			"INVENTORY_DBNAME=inventory",
-			"INVENTORY_DBUSER=i2g",
-			"INVENTORY_DBPASSWORD=qwertyuiop",
-			"INVENTORY_DBHOST=wi_mysql",
-			"INVENTORY_DIALECT=mysql",
-			"INVENTORY_DBPORT=3306",
-			"INVENTORY_JWTKEY=secretKey",
-			"INVENTORY_DATAPATH=/app/data/curve",
-			"INVENTORY_EXPORTPATH=/app/data/export",
-			"INVENTORY_MQTT_BROKER=wss://mqtt-broker.i2g.cloud"
-		],
-		"ports": "3002:9000",
-		"expose": "3002",
-		"networks": "i2g",
-		"volumes":
-		[
-			"${TMP}\\docker-local\\wi-inventory\\data\\curve:/app/data/curve",
-			"${TMP}\\docker-local\\wi-inventory\\data\\export:/app/data/export",
-			"${TMP}\\docker-local\\wi-inventory\\data\\uploads:/app/uploads"
-		]
+		"image": "118.70.171.246:30555/wi-online-inventory:local"
 	},
 	{
 		"container_name": "wi_backend",
-		"image": "118.70.171.246:30555/wi-backend:local",
-		"restart": "always",
-		"depends_on": ["wi_mysql", "wi_redis"],
-		"environment":
-		[
-			"INVENTORY_PORT=9000",
-			"INVENTORY_DBNAME=inventory",
-			"INVENTORY_DBUSER=i2g",
-			"INVENTORY_DBPASSWORD=qwertyuiop",
-			"INVENTORY_DBHOST=wi_mysql",
-			"INVENTORY_DIALECT=mysql",
-			"INVENTORY_DBPORT=3306",
-			"INVENTORY_JWTKEY=secretKey",
-			"INVENTORY_DATAPATH=/app/data/curve",
-			"INVENTORY_EXPORTPATH=/app/data/export",
-			"INVENTORY_MQTT_BROKER=wss://mqtt-broker.i2g.cloud"
-		],
-		"ports": "3002:9000",
-		"expose": "3002",
-		"networks": "i2g",
-		"volumes":
-		[
-			"${TMP}\\docker-local\\wi-inventory\\data\\curve:/app/data/curve",
-			"${TMP}\\docker-local\\wi-inventory\\data\\export:/app/data/export",
-			"${TMP}\\docker-local\\wi-inventory\\data\\uploads:/app/uploads"
-		]
+		"image": "118.70.171.246:30555/wi-backend:local"
 	},
 	{
 		"container_name": "wi_angular",
@@ -133,5 +42,9 @@
 	{
 		"container_name": "wi_base_map",
 		"image": "118.70.171.246:30555/base-map:local"
+	},
+	{
+		"container_name": "wi_csv_transformer",
+		"image": "118.70.171.246:30555/wi-csv-transformer:local"
 	}
 ]

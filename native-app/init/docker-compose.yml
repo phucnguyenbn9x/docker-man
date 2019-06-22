@@ -150,7 +150,7 @@ services:
     volumes:
       - ${TMP}\docker-local\wi-python-backend\storage:/app/storage
       - ${TMP}\docker-local\wi-python-backend\logs:/app/logs
-      - ${TMP}\docker-local\wi-python-backend\exports:/app/exports
+      - ${TMP}\docker-local\wi-python-backend\export:/app/export
   wi_angular:
     container_name: wi_angular
     image: ${REGISTRY_URL}/wi-angular:${I2G_VERSION}
@@ -181,36 +181,23 @@ services:
       - "82:80"
     networks:
       - i2g
-  # wi_file_browser_backend:
-  #   container_name: wi_file_browser_backend
-  #   build: ../file-browser-backend
-  #   image: file-browser-backend:latest
-  #   restart: always
-  #   environment:
-  #     NODE_ENV: "production"
-  #     STORAGE_ACCESS_KEY: ""
-  #     STORAGE_SECRET_KEY: ""
-  #     STORAGE_S3: "true"
-  #     STORAGE_BUCKET: ""
-  #     STORAGE_MAXSIZE_TEXT: "100"
-  #   ports:
-  #     - "3001:3001"
-  #   user: "${UID_GID}"
-  #   expose:
-  #     - "3001"
-  #   networks:
-  #     - i2g
-  #   volumes:
-  #     - /var/lib/docker-local/file-browser:/tmp/file-browser
-  # csv_transformer:
-  #   container_name: csv_transformer
-  #   image: csv-transformer:latest
-  #   build: ../csv-transformer
-  #   restart: always
-  #   ports:
-  #     - "3003:8000"
-  #   networks:
-  #     - i2g
+  wi_mqtt:
+    container_name: wi_mqtt
+    image: eclipse-mosquitto
+    restart: always
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    networks:
+      - i2g
+  wi_csv_transformer:
+    container_name: wi_csv_transformer
+    image: ${REGISTRY_URL}/csv-transformer:${I2G_VERSION}
+    restart: always
+    ports:
+      - "3005:8000"
+    networks:
+      - i2g
 networks:
   i2g:
     driver: bridge
