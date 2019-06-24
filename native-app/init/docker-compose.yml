@@ -136,7 +136,7 @@ services:
       PYTHON_ENV: "local"
       PYTHON_PROJECT_STORAGE: "/app/storage"
       PYTHON_LOG_PATH: "/app/logs"
-      PYTHON_EXPORT_PATH: "/app/exports"
+      PYTHON_EXPORT_PATH: "/app/export"
       PYTHON_CLIENT_DOMAIN: "http://localhost:8080"
       PROJECT_RELATED_ROOT_URL: "http://wi_backend:3000"
       USER_RELATED_ROOT_URL: "http://wi_auth:2999"
