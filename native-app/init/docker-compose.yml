@@ -21,6 +21,18 @@ services:
       - ${TMP}\docker-local\mysql:/var/lib/mysql
     networks:
       - i2g
+  wi_mongo:
+    container_name: wi_mongo
+    image: mongo:latest
+    restart: always
+    ports:
+      - "27017:27017"
+    expose:
+      - "27017"
+    volumes:
+      - ${TMP}\docker-local\mongo:/data/db
+    networks:
+      - i2g
   wi_redis:
     container_name: wi_redis
     image: redis:latest
@@ -196,6 +208,22 @@ services:
     restart: always
     ports:
       - "3005:8000"
+    networks:
+      - i2g
+  wi_pm:
+    container_name: wi_pm
+    image: ${REGISTRY_URL}/wipm:${I2G_VERSION}
+    restart: always
+    depends_on:
+      - wi_mongo
+    environment:
+      MONGO_HOST: wi_mongo
+      MONGO_PORT: "27017"
+    volumes:
+      - ${TMP}\docker-local\wi-pm:/app/files
+    ports:
+      - "5000:5000"
+      - "5555:5555"
     networks:
       - i2g
 networks:

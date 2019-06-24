@@ -46,5 +46,9 @@
 	{
 		"container_name": "wi_csv_transformer",
 		"image": "118.70.171.246:30555/wi-csv-transformer:local"
+	},
+	{
+		"container_name": "wi_pm",
+		"image": "118.70.171.246:30555/wipm:local"
 	}
 ]
