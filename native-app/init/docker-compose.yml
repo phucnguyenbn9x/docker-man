@@ -169,6 +169,8 @@ services:
     restart: always
     environment:
       NODE_ENV: "local"
+      BASE_URL: "http://wi_proxy:3033/backend"
+      AUTHENTICATION_SERVICE: "http://wi_proxy:3033/auth"
     ports:
       - "80:80"
     networks:
@@ -224,6 +226,18 @@ services:
     ports:
       - "5000:5000"
       - "5555:5555"
+    networks:
+      - i2g
+  wi_proxy:
+    container_name: wi_proxy
+    image: ${REGISTRY_URL}/wi-proxy:${I2G_VERSION}
+    restart: always
+    environment:
+      WI_AUTH_LOCAL: "http://wi_auth:2999"
+      WI_BACKEND_LOCAL: "http://wi_backend:3000"
+      WI_AUTH_CLOUD: "https://users.i2g.cloud"
+    ports:
+      - "3033:3033"
     networks:
       - i2g
 networks:
