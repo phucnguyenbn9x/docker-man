@@ -19,9 +19,8 @@ Run hyper-v.bat
 
 HƯỚNG DẪN TẠO FILE EXE:
 1. Chạy npm install
-2. CHạy npm run package-windows
-3. Chạy npm run 
-4. Chạy npm run build
-5. Vào folder native-app: copy file init vào trong file windows vừa sinh
-6. Sửa link trong file Dockerman - thanh.iss
-7. Chạy file dockerman-thanh.iss bằng innoSetup
+2. CHạy npm run build
+3. Chạy npm run package-windows
+4. Vào folder native-app: copy file init vào trong file windows vừa sinh
+5. Sửa link trong file Dockerman - thanh.iss
+6. Chạy file dockerman-thanh.iss bằng innoSetup
