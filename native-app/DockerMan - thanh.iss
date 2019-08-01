@@ -9,11 +9,11 @@
 
 #define UserFolder "{userappdata}\..\.."
 #define ProjectPath "{pf}"
-#define DockerManPath "D:\code\wi-project\docker-man\native-app\docker-man-win32-x64\*"
+#define DockerManPath "D:\workspace\docker-man\native-app\docker-man-win32-x64\*"
 #define Docker "Docker for Windows Installer.exe"
-#define DockerPath "D:\code\wi-project\docker-man\native-app\prerequisites\Docker for Windows Installer.exe"
+#define DockerPath "D:\workspace\docker-man\native-app\prerequisites\Docker for Windows Installer.exe"
 #define DockerUrl "https://download.docker.com/win/stable/Docker%20for%20Windows%20Installer.exe"
-#define DaemonJsonPath "D:\code\wi-project\docker-man\native-app\prerequisites\daemon.json"
+#define DaemonJsonPath "D:\workspace\docker-man\native-app\prerequisites\daemon.json"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
@@ -29,7 +29,7 @@ AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 DefaultDirName={pf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
-OutputDir=D:\code\wi-project\docker-man\native-app
+OutputDir=D:\workspace\docker-man\native-app
 OutputBaseFilename=DockerMan-Setup
 Compression=lzma
 SolidCompression=yes
@@ -80,6 +80,7 @@ Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: 
 
 [Run]
 Filename: "{app}\init\run.bat"; Flags: waituntilterminated runascurrentuser
+Filename: "{app}\init\initdb.bat"; Flags: waituntilterminated runascurrentuser
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 
 [UninstallRun]

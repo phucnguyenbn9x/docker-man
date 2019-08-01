@@ -1,54 +1,54 @@
 [
 	{
 		"container_name": "wi_mysql",
-		"image": "mysql:5.7"
+		"image": "127.0.0.1:30555/mysql:5.7"
 	},
 	{
 		"container_name": "wi_redis",
-		"image": "redis:latest"
+		"image": "127.0.0.1:30555/redis:latest"
 	},
 	{
 		"container_name": "wi_auth",
-		"image": "118.70.171.246:30555/wi-auth:local"
+		"image": "127.0.0.1:30555/wi-authenticate:0719"
 	},
 	{
 		"container_name": "wi_online_inventory",
-		"image": "118.70.171.246:30555/wi-online-inventory:local"
+		"image": "127.0.0.1:30555/wi-inventory:0719"
 	},
 	{
 		"container_name": "wi_backend",
-		"image": "118.70.171.246:30555/wi-backend:local"
+		"image": "127.0.0.1:30555/wi-backend:0719"
 	},
 	{
 		"container_name": "wi_angular",
-		"image": "118.70.171.246:30555/wi-angular:local"
+		"image": "127.0.0.1:30555/wi-angular:0719"
 	},
 	{
 		"container_name": "wi_proxy",
-		"image": "118.70.171.246:30555/wi-proxy:local"
+		"image": "127.0.0.1:30555/wi-proxy:0719"
 	},
 	{
 		"container_name": "wi_python_backend",
-		"image": "118.70.171.246:30555/wi-python-backend:local"
+		"image": "127.0.0.1:30555/wi-python-production:0719"
 	},
 	{
 		"container_name": "wi_python_frontend",
-		"image": "118.70.171.246:30555/wi-python-frontend:local"
+		"image": "127.0.0.1:30555/wi-python-frontend:0719"
 	},
 	{
 		"container_name": "wi_mongo",
-		"image": "mongo"
+		"image": "127.0.0.1:30555/mongo:latest"
 	},
 	{
 		"container_name": "wi_base_map",
-		"image": "118.70.171.246:30555/base-map:local"
+		"image": "127.0.0.1:30555/base-map:0719"
 	},
 	{
 		"container_name": "wi_csv_transformer",
-		"image": "118.70.171.246:30555/wi-csv-transformer:local"
+		"image": "127.0.0.1:30555/wi-csv-transform:0719"
 	},
 	{
 		"container_name": "wi_pm",
-		"image": "118.70.171.246:30555/wipm:local"
+		"image": "127.0.0.1:30555/wipm:0719"
 	}
 ]

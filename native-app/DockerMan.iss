@@ -2,17 +2,19 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "DockerMan"
-#define MyAppVersion "1.0.0"
+#define MyAppVersion "1.0719.0"
 #define MyAppPublisher "I2G"
 #define MyAppURL "http://www.i2g.com/"
 #define MyAppExeName "docker-man.exe"
 
 #define UserFolder "{userappdata}\..\.."
-
-#define DockerManPath "D:\well-insight\docker-man\native-app\docker-man-win32-x64\*"
+#define ProjectPath "{pf}"
+#define DockerManPath "D:\workspace\docker-man\native-app\docker-man-win32-x64\*"
 #define Docker "Docker for Windows Installer.exe"
-#define DockerPath "D:\well-insight\docker-man\native-app\prerequisites\Docker for Windows Installer.exe"
-#define DaemonJsonPath "D:\well-insight\docker-man\native-app\prerequisites\daemon.json"
+#define DockerPath "D:\workspace\docker-man\native-app\prerequisites\Docker for Windows Installer.exe"
+#define DockerUrl "https://download.docker.com/win/stable/Docker%20for%20Windows%20Installer.exe"
+#define DaemonJsonPath "D:\workspace\docker-man\native-app\prerequisites\daemon.json"
+#define DockerRegistryStorage "D:\workspace\docker-man\native-app\docker-man-win32-x64\i2g_registry"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
@@ -28,10 +30,11 @@ AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 DefaultDirName={pf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
-OutputDir=D:\well-insight\docker-man\native-app
+OutputDir=D:\workspace\docker-man\native-app
 OutputBaseFilename=DockerMan-Setup
 Compression=lzma
 SolidCompression=yes
+ChangesEnvironment=yes
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -40,27 +43,17 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "{#DockerManPath}"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "{#DockerPath}"; DestDir: "{app}"; Check: InstallDockerConfirm; Flags: ignoreversion; AfterInstall: InstallDocker
-Source: "{#DaemonJsonPath}"; DestDir: "{#UserFolder}\.docker"; Check: getCheckInstallDocker; Flags: ignoreversion;
+Source: {#DockerManPath}; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs; BeforeInstall: InstallDockerConfirm;
+Source: {#DockerRegistryStorage}; DestDir: "{app}"; Flags: recursesubdirs createallsubdirs;
+Source: "{#DaemonJsonPath}"; DestDir: "{#UserFolder}\.docker"; Flags: ignoreversion;
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Code]
 var checkInstallDocker: Boolean;
 
-procedure InstallDocker;
-var
-  ResultCode: Integer;
-begin
-  if not Exec(ExpandConstant('{app}\{#Docker}'), '', '', SW_SHOWNORMAL, ewWaitUntilTerminated, ResultCode) then begin
-    MsgBox('Can not install Docker', mbError, MB_OK);
-  end;
-end;
-
 function InitializeSetup(): Boolean;
 begin
   if RegKeyExists(HKEY_LOCAL_MACHINE_64, 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Docker for Windows') then begin
-  {if RegKeyExists(HKEY_LOCAL_MACHINE_64, 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\1') then begin}
     checkInstallDocker := False;
   end else begin
     checkInstallDocker := True;
@@ -68,39 +61,23 @@ begin
   Result := True;
 end;
 
-function NeedRestart(): Boolean;
-begin
-  if checkInstallDocker then begin
-    Result := True;
-  end else begin
-    Result := False;
-  end;
-end;
-
-procedure CurStepChanged(CurStep: TSetupStep);
-begin
-  if CurStep = ssDone then begin
-    if checkInstallDocker then begin
-      DeleteFile(ExpandConstant('{app}\{#Docker}'));
-    end;
-  end;
-end;
-
+procedure ExitProcess(uExitCode: Integer);
+  external 'ExitProcess@kernel32.dll stdcall';
 var
   dockerChecked: Boolean;
-function InstallDockerConfirm(): Boolean;
+procedure InstallDockerConfirm;
+var
+  ErrCode: Integer;
 begin
   if not dockerChecked and checkInstallDocker then begin
-    checkInstallDocker := MsgBox('Can not find Docker Desktop!' + #13#10 + #13#10 + 'Install it now?', mbConfirmation, MB_YESNO) = idYes;
-    dockerChecked := True;
+    SuppressibleMsgBox('Docker is required. You need install Docker before install DockerMan', mbError, MB_OK, MB_OK);
+    ExitProcess(1);
   end;
-  Result := checkInstallDocker;
 end;
 
-function getCheckInstallDocker(): Boolean;
-begin
-  Result := checkInstallDocker;
-end;
+[Registry]
+Root: HKCU; Subkey: "Environment"; ValueType:string; ValueName: "I2G_DOCKERMAN"; \
+    ValueData: {app}; Flags: preservestringtype
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
@@ -108,5 +85,11 @@ Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
 Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 
 [Run]
-Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 
+Filename: "{cmd}"; Parameters: "/C cd {app}\init & set I2G_DOCKERMAN={app}&""{app}\init\run.bat"""; Flags: waituntilterminated runascurrentuser;
+;Filename: "{app}\init\run.bat"; Flags: waituntilterminated runascurrentuser postinstall; Description: "Start i2g services now"; Parameters: "/C set I2G_DOCKERMAN={app}"
+;Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
+Filename: "http://localhost:9090"; Flags: shellexec runasoriginaluser postinstall skipifsilent; Description: "Open I2G App"
+
+[UninstallRun]
+Filename: "{app}\init\stop.bat"; Flags: waituntilterminated

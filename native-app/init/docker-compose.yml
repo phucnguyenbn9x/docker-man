@@ -2,14 +2,14 @@ version: "3.3"
 services:
   wi_mysql:
     container_name: wi_mysql
-    image: mysql:5.7
+    image: ${REGISTRY_URL}/mysql:5.7
     restart: always
     command: --init-file /data/application/init.sql
     environment:
       MYSQL_PASSWORD: "qwertyuiop"
       MYSQL_ROOT_PASSWORD: "qwertyuiop"
     ports:
-      - "3306:3306"
+      - "30336:3306"
     expose:
       - "3306"
     healthcheck:
@@ -18,34 +18,58 @@ services:
       retries: 10
     volumes:
       - .\initdb\init.sql:/data/application/init.sql
-      - ${TMP}\docker-local\mysql:/var/lib/mysql
+      - ${STORAGE}\docker-local\mysql:/var/lib/mysql
     networks:
       - i2g
   wi_mongo:
     container_name: wi_mongo
-    image: mongo:latest
+    image: ${REGISTRY_URL}/mongo:latest
     restart: always
-    ports:
-      - "27017:27017"
+    # ports:
+    #   - "32017:27017"
     expose:
       - "27017"
-    volumes:
-      - ${TMP}\docker-local\mongo:/data/db
+    # volumes:
+    #   - ${STORAGE}\docker-local\mongo:/data/db
     networks:
       - i2g
   wi_redis:
     container_name: wi_redis
-    image: redis:latest
+    image: ${REGISTRY_URL}/redis:latest
     restart: always
-    ports:
-      - "6379:6379"
+    # ports:
+    #   - "30379:6379"
     expose:
       - "6379"
     networks:
       - i2g
+  wi_mqtt:
+    container_name: wi_mqtt
+    image: ${REGISTRY_URL}/eclipse-mosquitto:latest
+    restart: always
+    ports:
+      - "30883:1883"
+      - "30901:9001"
+    expose:
+      - "1883"
+      - "9001"
+    volumes:
+      - .\mosquitto.conf:/mosquitto/config/mosquitto.conf
+    networks:
+      - i2g
+  wi_csv_transformer:
+    container_name: wi_csv_transformer
+    image: ${REGISTRY_URL}/wi-csv-transform:${I2G_VERSION}
+    restart: always
+    # ports:
+    #   - "3005:8000"
+    expose:
+      - "8000"
+    networks:
+      - i2g 
   wi_auth:
     container_name: wi_auth
-    image: ${REGISTRY_URL}/wi-auth:${I2G_VERSION}
+    image: ${REGISTRY_URL}/wi-authenticate:${I2G_VERSION}
     restart: always
     depends_on:
       - wi_mysql
@@ -59,14 +83,14 @@ services:
       AUTH_DBPORT: "3306"
       AUTH_DBSTORAGE: "/tmp/wi_backend.sqlite"
     ports:
-      - "2999:2999"
+      - "30000:2999"
     expose:
       - "2999"
     networks:
       - i2g
   wi_online_inventory:
     container_name: wi_online_inventory
-    image: ${REGISTRY_URL}/wi-online-inventory:${I2G_VERSION}
+    image: ${REGISTRY_URL}/wi-inventory:${I2G_VERSION}
     restart: always
     depends_on:
       - wi_mysql
@@ -78,20 +102,20 @@ services:
       INVENTORY_DBHOST: wi_mysql
       INVENTORY_DIALECT: "mysql"
       INVENTORY_DBPORT: "3306"
-      INVENTORY_JWTKEY: "secretKey"
       INVENTORY_DATAPATH: "/app/data/curve"
       INVENTORY_EXPORTPATH: "/app/data/export"
-      INVENTORY_MQTT_BROKER: "wss://mqtt-broker.i2g.cloud"
+      INVENTORY_MQTT_BROKER: "mqtt://wi_matt:1883"
+      INVENTORY_JWTKET: "secretKey"
     ports:
-      - "3002:9000"
+      - "30003:9000"
     expose:
       - "3002"
     networks:
       - i2g
     volumes:
-      - ${TMP}\docker-local\wi-inventory\data\curve:/app/data/curve
-      - ${TMP}\docker-local\wi-inventory\data\export:/app/data/export
-      - ${TMP}\docker-local\wi-inventory\data\uploads:/app/uploads
+      - ${STORAGE}\docker-local\wi-inventory\data\curve:/app/data/curve
+      - ${STORAGE}\docker-local\wi-inventory\data\export:/app/data/export
+      - ${STORAGE}\docker-local\wi-inventory\data\uploads:/app/uploads
   wi_backend:
     container_name: wi_backend
     image: ${REGISTRY_URL}/wi-backend:${I2G_VERSION}
@@ -99,6 +123,7 @@ services:
     depends_on:
       - wi_mysql
       - wi_redis
+      - wi_mqtt
     environment:
       BACKEND_PORT: "3000"
       BACKEND_DBNAME: "wi_backend"
@@ -113,66 +138,67 @@ services:
       BACKEND_REDIS_PORT: "6379"
       BACKEND_AUTH_SERVICE: "http://wi_auth:2999"
       BACKEND_INV_SERVICE: "http://wi_online_inventory:9000"
-      BACKEND_CSV_SERVICE: "http://csv_transformer:8000"
-      LOGGING_SERVICE: "http://logger.dev.i2g.cloud"
-      BACKEND_ELASTICSEARCH: "http://elasticsearch"
-      BACKEND_MQTT_BROKER: "wss://mqtt-broker.i2g.cloud"
+      BACKEND_CSV_SERVICE: "http://wi_csv_transformer:8000"
+      BACKEND_MQTT_BROKER: "mqtt://wi_mqtt:1883"
       BACKEND_CURVE_BASE_PATH: "/app/data/curve"
       BACKEND_IMAGE_BASE_PATH: "/app/data/image"
       BACKEND_EXPORT_PATH: "/app/data/export"
       BACKEND_USER_LOG_PATH: "/app/data/user-log"
       BACKEND_USER_UPLOAD_PATH: "/app/data/uploads"
+      THUMBNAIL_SERVICE: "http://wi_imgproxy:8080"
+      PUBLIC_ADDRESS: "http://wi_backend:3000"
       BACKEND_JWTKEY: "secretKey"
+      SALT: "wi-hash"
+      VALIDATION_REQUEST_STATUS: "false"
     ports:
-      - "3000:3000"
+      - "30001:3000"
     expose:
       - "3000"
     networks:
       - i2g
     volumes:
-      - ${TMP}\docker-local\wi-backend\curve:/app/data/curve
-      - ${TMP}\docker-local\wi-backend\image:/app/data/image
-      - ${TMP}\docker-local\wi-backend\export:/app/data/export
-      - ${TMP}\docker-local\wi-backend\user-log:/app/data/user-log
-      - ${TMP}\docker-local\wi-backend\uploads:/app/data/uploads
+      - ${STORAGE}\docker-local\wi-backend\curve:/app/data/curve
+      - ${STORAGE}\docker-local\wi-backend\image:/app/data/image
+      - ${STORAGE}\docker-local\wi-backend\export:/app/data/export
+      - ${STORAGE}\docker-local\wi-backend\user-log:/app/data/user-log
+      - ${STORAGE}\docker-local\wi-backend\uploads:/app/data/uploads
 
   wi_python_backend:
     container_name: wi_python_backend
-    image: ${REGISTRY_URL}/wi-python-backend:${I2G_VERSION}
+    image: ${REGISTRY_URL}/wi-python-production:${I2G_VERSION}
     restart: always
-    depends_on:
-      - wi_mysql
-      - wi_redis
     environment:
       PYTHON_PORT: "3000"
       PYTHON_ENV: "local"
+      USER_RELATED_ROOT_URL: "http://wi_auth:2999"
+      PROJECT_RELATED_ROOT_URL: "http://wi_backend:3000"
+      PYTHON_DOWNLOAD_BASE_URL: "http://localhost:30002"
+      PYTHON_CLIENT_DOMAIN: "http://localhost:9091"
       PYTHON_PROJECT_STORAGE: "/app/storage"
       PYTHON_LOG_PATH: "/app/logs"
       PYTHON_EXPORT_PATH: "/app/export"
-      PYTHON_CLIENT_DOMAIN: "http://localhost:8080"
-      PROJECT_RELATED_ROOT_URL: "http://wi_backend:3000"
-      USER_RELATED_ROOT_URL: "http://wi_auth:2999"
-      PYTHON_DOWNLOAD_BASE_URL: "http://localhost:3003"
+      SALT: "wi-hash"
+      PYTHON_JWTKEY: "secretKey"
     ports:
-      - "3003:3000"
+      - "30002:3000"
     expose:
       - "3003"
     networks:
       - i2g
     volumes:
-      - ${TMP}\docker-local\wi-python-backend\storage:/app/storage
-      - ${TMP}\docker-local\wi-python-backend\logs:/app/logs
-      - ${TMP}\docker-local\wi-python-backend\export:/app/export
+      - ${STORAGE}\docker-local\wi-python-backend\storage:/app/storage
+      - ${STORAGE}\docker-local\wi-python-backend\logs:/app/logs
+      - ${STORAGE}\docker-local\wi-python-backend\export:/app/export
   wi_angular:
     container_name: wi_angular
     image: ${REGISTRY_URL}/wi-angular:${I2G_VERSION}
     restart: always
-    environment:
-      NODE_ENV: "local"
-      BASE_URL: "http://wi_proxy:3033/backend"
-      AUTHENTICATION_SERVICE: "http://wi_proxy:3033/auth"
+    # environment:
+    #   NODE_ENV: "local"
+    #   BASE_URL: "http://wi_proxy:3033/backend"
+    #   AUTHENTICATION_SERVICE: "http://wi_proxy:3033/auth"
     ports:
-      - "80:80"
+      - "9090:80"
     networks:
       - i2g
   wi_python_frontend:
@@ -182,7 +208,7 @@ services:
     environment:
       NODE_ENV: "local"
     ports:
-      - "81:80"
+      - "9091:80"
     networks:
       - i2g
   wi_base_map:
@@ -192,24 +218,7 @@ services:
     environment:
       NODE_ENV: "local"
     ports:
-      - "82:80"
-    networks:
-      - i2g
-  wi_mqtt:
-    container_name: wi_mqtt
-    image: eclipse-mosquitto
-    restart: always
-    ports:
-      - "1883:1883"
-      - "9001:9001"
-    networks:
-      - i2g
-  wi_csv_transformer:
-    container_name: wi_csv_transformer
-    image: ${REGISTRY_URL}/csv-transformer:${I2G_VERSION}
-    restart: always
-    ports:
-      - "3005:8000"
+      - "9092:80"
     networks:
       - i2g
   wi_pm:
@@ -222,10 +231,10 @@ services:
       MONGO_HOST: wi_mongo
       MONGO_PORT: "27017"
     volumes:
-      - ${TMP}\docker-local\wi-pm:/app/files
+      - ${STORAGE}\docker-local\wi-pm:/app/files
     ports:
-      - "5000:5000"
-      - "5555:5555"
+      - "30005:5000"
+      - "30055:5555"
     networks:
       - i2g
   wi_proxy:
@@ -237,7 +246,17 @@ services:
       WI_BACKEND_LOCAL: "http://wi_backend:3000"
       WI_AUTH_CLOUD: "https://users.i2g.cloud"
     ports:
-      - "3033:3033"
+      - "30033:3033"
+    networks:
+      - i2g
+  wi_imgproxy:
+    container_name: wi_imgproxy
+    image: ${REGISTRY_URL}/wi-imgproxy:${I2G_VERSION}
+    restart: always
+    # ports:
+    #   - "30088:8080"
+    expose: 
+      - "8080"
     networks:
       - i2g
 networks:

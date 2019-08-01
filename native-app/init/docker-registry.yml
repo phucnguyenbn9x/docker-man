@@ -1,0 +1,12 @@
+version: "3.3"
+services:
+  wi_docker_registry:
+    container_name: wi_docker_registry
+    image: registry:2
+    restart: always
+    volumes: 
+      - ${I2G_DOCKERMAN}\i2g_registry:/var/lib/registry
+      # - C:\Program Files (x86)\DockerMan\i2g_registry:/var/lib/registry
+
+    ports: 
+      - "30555:5000"
