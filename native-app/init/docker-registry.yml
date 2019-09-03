@@ -5,8 +5,9 @@ services:
     image: registry:2
     restart: always
     volumes: 
-      - ${I2G_DOCKERMAN}\i2g_registry:/var/lib/registry
+      #- ${I2G_DOCKERMAN}\i2g_registry:/var/lib/registry
       # - C:\Program Files (x86)\DockerMan\i2g_registry:/var/lib/registry
+      - D:\workspace\docker-man\native-app\docker-man-win32-x64\i2g_registry:/var/lib/registry
 
     ports: 
       - "30555:5000"

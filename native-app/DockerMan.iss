@@ -53,7 +53,7 @@ var checkInstallDocker: Boolean;
 
 function InitializeSetup(): Boolean;
 begin
-  if RegKeyExists(HKEY_LOCAL_MACHINE_64, 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Docker for Windows') then begin
+  if RegKeyExists(HKEY_LOCAL_MACHINE_64, 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Docker for Windows') or RegKeyExists(HKEY_LOCAL_MACHINE_64, 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Docker Desktop') then begin
     checkInstallDocker := False;
   end else begin
     checkInstallDocker := True;
